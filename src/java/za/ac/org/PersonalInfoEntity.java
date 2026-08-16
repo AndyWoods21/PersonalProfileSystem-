@@ -12,6 +12,8 @@ public class PersonalInfoEntity implements Serializable {
 
     private Long personalInfoId;
     private User user;
+    public String fullname;
+     public String email;
     private String jobTitle;
     private String location;
     private String professionalSummary;
@@ -75,5 +77,20 @@ public class PersonalInfoEntity implements Serializable {
 
     public void setWebsiteUrl(String websiteUrl) {
         this.websiteUrl = websiteUrl;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
