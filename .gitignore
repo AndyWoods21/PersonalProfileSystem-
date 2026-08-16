@@ -1,0 +1,50 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Build
+target/
+build/
+dist/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+.m2/
+maven-metadata-local.xml
+
+# Gradle
+.gradle/
+gradle/
+
+# NetBeans
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE Config
+.classpath
+.project
+.settings/
+
+# Node (if added)
+node_modules/
+npm-debug.log
+
+# Environment
+.env
+.env.local
