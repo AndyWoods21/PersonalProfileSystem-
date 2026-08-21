@@ -7,17 +7,18 @@
     <title>Management Area Registration</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --border-color: #334155;
-            --error-color: #ef4444;
-            --error-bg: rgba(239, 68, 68, 0.1);
-            --success-color: #22c55e;
-            --success-bg: rgba(34, 197, 94, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #0284c7;
+            --accent-hover: #0369a1;
+            --input-bg: rgba(255, 255, 255, 0.75);
+            --input-border: rgba(203, 213, 225, 0.8);
+            --error-color: #dc2626;
+            --error-bg: rgba(254, 226, 226, 0.85);
+            --success-color: #16a34a;
+            --success-bg: rgba(220, 252, 231, 0.85);
         }
 
         * {
@@ -28,7 +29,11 @@
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: var(--bg-color);
+            background-image: url('${pageContext.request.contextPath}/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
@@ -38,13 +43,16 @@
         }
 
         .signup-container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
             width: 100%;
             max-width: 450px;
             padding: 2.5rem 2rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.15), 
+                        0 0 15px 0 rgba(255, 255, 255, 0.5) inset;
         }
 
         .signup-header {
@@ -56,6 +64,7 @@
             font-size: 1.6rem;
             color: var(--text-color);
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
 
         .signup-header p {
@@ -65,23 +74,25 @@
 
         .alert {
             padding: 0.75rem 1rem;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.875rem;
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .alert-error {
             background-color: var(--error-bg);
-            border: 1px solid var(--error-color);
+            border: 1px solid rgba(220, 38, 38, 0.3);
             color: var(--error-color);
         }
 
         .alert-success {
             background-color: var(--success-bg);
-            border: 1px solid var(--success-color);
+            border: 1px solid rgba(22, 163, 74, 0.3);
             color: var(--success-color);
         }
 
@@ -92,7 +103,7 @@
         label {
             display: block;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.5rem;
             color: var(--text-color);
         }
@@ -102,43 +113,50 @@
         input[type="password"] {
             width: 100%;
             padding: 0.75rem 1rem;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
             color: var(--text-color);
             font-size: 0.95rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
-        input:focus {
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
         }
 
         .btn-submit {
             width: 100%;
             padding: 0.75rem;
             background-color: var(--accent-color);
-            color: var(--bg-color);
+            color: #ffffff;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
             margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
         }
 
         .btn-submit:hover {
             background-color: var(--accent-hover);
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
         }
 
         .login-prompt {
             text-align: center;
             margin-top: 1.5rem;
             padding-top: 1.25rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
             font-size: 0.875rem;
             color: var(--text-muted);
         }
@@ -176,7 +194,7 @@
     <div class="signup-container">
         <div class="signup-header">
             <h1>Create Account</h1>
-            <p>Register as developer to access management controls[cite: 1, 2].</p>
+            <p>Register as developer to access management controls.</p>
         </div>
 
         <%-- Dynamic Error/Success Banners --%>
@@ -187,14 +205,14 @@
             if (error != null || request.getAttribute("errorMessage") != null) {
                 String message = (request.getAttribute("errorMessage") != null) 
                                  ? (String) request.getAttribute("errorMessage") 
-                                 : "Registration failed. Please check your details and try again[cite: 1, 2].";
+                                 : "Registration failed. Please check your details and try again.";
         %>
             <div class="alert alert-error">
                 <span>⚠️ <%= message %></span>
             </div>
         <% } else if (success != null) { %>
             <div class="alert alert-success">
-                <span>✅ Account created successfully! You can now log in[cite: 1, 2].</span>
+                <span>✅ Account created successfully! You can now log in.</span>
             </div>
         <% } %>
 
@@ -281,7 +299,7 @@
 
             if (password !== confirmPassword) {
                 e.preventDefault();
-                alert('Passwords do not match. Please verify and try again[cite: 1, 2].');
+                alert('Passwords do not match. Please verify and try again.');
             }
         });
     </script>

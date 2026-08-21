@@ -15,7 +15,8 @@ import za.ac.org.PersonalInfoEntity;
 import za.ac.org.User;
 
 /**
- * Servlet handling user authentication and loading profile data into the session.
+ * Servlet handling user authentication and loading profile data into the
+ * session.
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet", "/LoginServlet.do"})
 public class LoginServlet extends HttpServlet {
@@ -36,7 +37,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         HttpSession session = request.getSession();
 
         // Fetch login input parameters
@@ -44,9 +45,9 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         // Validation for empty inputs
-        if (username == null || username.trim().isEmpty() || 
-            password == null || password.trim().isEmpty()) {
-            
+        if (username == null || username.trim().isEmpty()
+                || password == null || password.trim().isEmpty()) {
+
             request.setAttribute("errorMessage", "Please provide both username and password.");
             RequestDispatcher disp = request.getRequestDispatcher("login.jsp");
             disp.forward(request, response);
@@ -59,7 +60,7 @@ public class LoginServlet extends HttpServlet {
 
             // Validate credentials safely against nulls
             if (user != null && user.getPasswordHash() != null && user.getPasswordHash().equals(password)) {
-                
+
                 // Fetch associated PersonalInfoEntity profile safely
                 PersonalInfoEntity profile = null;
                 try {
@@ -69,10 +70,11 @@ public class LoginServlet extends HttpServlet {
                     log("Profile load failed for user: " + username, e);
                 }
 
-                // Save entities in session for Dashboard.jsp
+                // Save entities and status in session for Dashboard.jsp
                 session.setAttribute("currentUser", user);
                 session.setAttribute("PersonalInfo", profile);
-                
+                session.setAttribute("isRegistered", true); // Marks user as logged in for future updates
+
                 // Redirect to Dashboard
                 response.sendRedirect(request.getContextPath() + "/Dashboard.jsp");
             } else {

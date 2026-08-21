@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="za.ac.org.PersonalInfoEntity" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Security Gatekeeper: Check if user is logged in --%>
@@ -6,12 +7,19 @@
     <c:redirect url="/login.jsp?error=unauthorized" />
 </c:if>
 
+<%
+    // Retrieve profile data from session
+    PersonalInfoEntity profile = (PersonalInfoEntity) session.getAttribute("PersonalInfo");
+    if (profile == null) {
+        profile = new PersonalInfoEntity();
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard — <c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : 'Not Provided'}" /></title>
+    <title>Edit Profile — DevProfile</title>
     <style>
         :root {
             --bg-main: rgba(255, 255, 255, 0.95);
@@ -29,6 +37,7 @@
             --radius-lg: 24px;
             --radius-md: 16px;
             --radius-pill: 9999px;
+            --input-bg: #FFFFFF;
         }
 
         * {
@@ -184,41 +193,123 @@
         main {
             flex: 1;
             padding: 2rem;
+            max-width: 850px;
         }
 
-        /* Welcome Banner Card */
-        .welcome-card {
-            background-color: var(--card-cream);
-            border: 1px solid rgba(0,0,0,0.04);
+        .card {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 2rem;
-            margin-bottom: 1.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             box-shadow: var(--shadow-soft);
             backdrop-filter: blur(8px);
         }
 
-        .welcome-text h1 {
-            font-size: 1.75rem;
+        .card h2 {
+            font-size: 1.5rem;
             font-weight: 800;
             letter-spacing: -0.5px;
-            margin-bottom: 0.35rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .welcome-text p {
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-dark);
             font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        /* Grid Layout for Cards */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 1.5rem;
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--navy-cta);
+            box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
         }
 
+        textarea {
+            resize: vertical;
+            min-height: 130px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-submit {
+            background-color: var(--navy-cta);
+            color: #FFFFFF;
+            padding: 0.65rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-pill);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 1.5rem;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background-color: var(--card-cream);
+            color: var(--text-dark);
+        }
+
+        /* Responsive Adjustments */
         @media (max-width: 900px) {
             .app-container {
                 flex-direction: column;
@@ -228,82 +319,6 @@
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
             }
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-            .welcome-card {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1.25rem;
-            }
-        }
-
-        .card {
-            background-color: var(--bg-main);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 1.75rem;
-            box-shadow: var(--shadow-soft);
-            backdrop-filter: blur(8px);
-        }
-
-        .card-dark-theme {
-            background-color: var(--card-dark);
-            color: #FFFFFF;
-            border: none;
-        }
-
-        .card h2 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .card-dark-theme h2 {
-            color: #FFFFFF;
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .info-row {
-            margin-bottom: 1.15rem;
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-        }
-
-        .card-dark-theme .info-label {
-            color: #94A3B8;
-        }
-
-        .info-value {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--text-dark);
-            word-break: break-word;
-        }
-
-        .card-dark-theme .info-value {
-            color: #F8FAFC;
-        }
-
-        .card-actions {
-            margin-top: 1.75rem;
-            display: flex;
-            gap: 1rem;
         }
 
         /* Footer */
@@ -337,10 +352,10 @@
             <div>
                 <p class="sidebar-section-title">Overview</p>
                 <ul class="nav-menu">
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/Dashboard.jsp">📊 Dashboard</a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a href="${pageContext.request.contextPath}/EditInfoServlet.do">👤 Personal Info</a>
                     </li>
                     <li class="nav-item">
@@ -373,57 +388,59 @@
 
         <!-- Main Content Area -->
         <main>
-            <!-- Welcome Banner -->
-            <div class="welcome-card">
-                <div class="welcome-text">
-                    <h1>Welcome back, <c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : 'Not Provided'}" />!</h1>
-                    <p>Manage your account settings and profile information from your personal dashboard.</p>
-                </div>
-                <a href="${pageContext.request.contextPath}/EditInfoServlet.do" class="btn-action-sm">Edit Profile &rarr;</a>
-            </div>
+            <div class="card">
+                <h2>Edit Profile Information</h2>
 
-            <div class="dashboard-grid">
-                <!-- Account Credentials Overview (Dark Accent Card) -->
-                <div class="card card-dark-theme">
-                    <h2>Account Information</h2>
-                    <div class="info-row">
-                        <span class="info-label">Username</span>
-                        <span class="info-value"><c:out value="${sessionScope.currentUser.username}" /></span>
+                <%-- Error message banner --%>
+                <% if (request.getAttribute("errorMessage") != null) { %>
+                    <div class="alert-error">
+                        <%= request.getAttribute("errorMessage") %>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Email Address</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.email ? sessionScope.PersonalInfo.email : 'Not Provided'}" /></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Account Role</span>
-                        <span class="info-value"><c:out value="${sessionScope.currentUser.role}" /></span>
-                    </div>
-                </div>
+                <% } %>
 
-                <!-- Professional Profile Overview -->
-                <div class="card">
-                    <h2>Profile Details</h2>
-                    <div class="info-row">
-                        <span class="info-label">Full Name</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : 'Not Provided'}" /></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Professional Title / Role</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.jobTitle ? sessionScope.PersonalInfo.jobTitle : 'No title specified'}" /></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Location</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.location ? sessionScope.PersonalInfo.location : 'No location specified'}" /></span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Professional Bio / Summary</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.professionalSummary ? sessionScope.PersonalInfo.professionalSummary : 'No summary added yet.'}" /></span>
+                <form action="${pageContext.request.contextPath}/EditInfoServlet.do" method="POST">
+                    
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" 
+                               id="fullname" 
+                               name="fullname" 
+                               value="<%= profile.getFullname() != null ? profile.getFullname() : "" %>" 
+                               placeholder="e.g. John Doe" 
+                               required />
                     </div>
 
-                    <div class="card-actions">
-                        <a href="${pageContext.request.contextPath}/PublicProfileServlet.do?user=${sessionScope.currentUser.username}" target="_blank" class="btn-action-sm">View Public Profile ↗</a>
+                    <div class="form-group">
+                        <label for="title">Job Title</label>
+                        <input type="text" 
+                               id="title" 
+                               name="title" 
+                               value="<%= profile.getJobTitle() != null ? profile.getJobTitle() : "" %>" 
+                               placeholder="e.g. Software Developer" />
                     </div>
-                </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" 
+                               id="location" 
+                               name="location" 
+                               value="<%= profile.getLocation() != null ? profile.getLocation() : "" %>" 
+                               placeholder="e.g. Pretoria, South Africa" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bio">Professional Summary / Bio</label>
+                        <textarea id="bio" 
+                                  name="bio" 
+                                  placeholder="Write a brief overview of your skills and background..."><%= profile.getProfessionalSummary() != null ? profile.getProfessionalSummary() : "" %></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="${pageContext.request.contextPath}/Dashboard.jsp" class="btn-cancel">Cancel</a>
+                        <button type="submit" class="btn-submit">Save Changes</button>
+                    </div>
+
+                </form>
             </div>
         </main>
     </div>

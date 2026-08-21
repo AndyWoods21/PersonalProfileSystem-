@@ -34,13 +34,26 @@ public class AddInformationServlet extends HttpServlet {
         String location = request.getParameter("location");
         String bio = request.getParameter("bio");
 
-        PersonalInfoEntity pi = (PersonalInfoEntity) session.getAttribute("PersonalInfo");
+        Boolean isRegisteredUser = (Boolean) session.getAttribute("isRegistered");
+        PersonalInfoEntity pi = null;
+
+        // Determine entity source based on registration status
+        if (Boolean.TRUE.equals(isRegisteredUser)) {
+            pi = (PersonalInfoEntity) session.getAttribute("PersonalInfo");
+        } else {
+            pi = (PersonalInfoEntity) session.getAttribute("NewSignUp");
+            if (pi == null) {
+                // Initialize if navigating from initial sign-up step
+                pi = new PersonalInfoEntity();
+            }
+        }
+
         User currentUser = (User) session.getAttribute("currentUser");
 
-        if (pi == null) {
-            // Session expired or direct access attempt
-            request.setAttribute("errorMessage", "Session expired or invalid registration state. Please register again.");
-            request.getRequestDispatcher("signUp.jsp").forward(request, response);
+        // Fail-safe check if registered user session is lost
+        if (Boolean.TRUE.equals(isRegisteredUser) && pi == null) {
+            request.setAttribute("errorMessage", "Session expired or invalid state. Please log in again.");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
 
@@ -54,9 +67,8 @@ public class AddInformationServlet extends HttpServlet {
             pi.setUser(currentUser);
         }
 
-        // Check if user is completing registration vs. updating from Dashboard
-        Boolean isRegisteredUser = (Boolean) session.getAttribute("isRegistered");
-        if (isRegisteredUser != null && isRegisteredUser) {
+        // Flow 1: Registered User Editing Profile from Dashboard
+        if (Boolean.TRUE.equals(isRegisteredUser)) {
             try {
                 pifl.edit(pi); // Persist updates directly to DB
                 session.setAttribute("PersonalInfo", pi);
@@ -70,7 +82,7 @@ public class AddInformationServlet extends HttpServlet {
             }
         }
 
-        // Unconfirmed sign-up flow -> forward to confirmation step
+        // Flow 2: Unconfirmed Sign-Up Registration
         session.setAttribute("NewSignUp", pi);
         RequestDispatcher disp = request.getRequestDispatcher("ConfirmSignUpdetails.jsp");
         disp.forward(request, response);

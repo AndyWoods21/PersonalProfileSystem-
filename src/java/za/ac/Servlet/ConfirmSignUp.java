@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import za.ac.bl.PersonalInfoEntityFacadeLocal;
 import za.ac.org.PersonalInfoEntity;
+import za.ac.org.User; // Ensure User entity is imported
 
 @WebServlet(name = "ConfirmSignUp", urlPatterns = {"/ConfirmSignUp", "/ConfirmSignUp.do"})
 public class ConfirmSignUp extends HttpServlet {
@@ -29,6 +30,7 @@ public class ConfirmSignUp extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         PersonalInfoEntity pi = (PersonalInfoEntity) session.getAttribute("NewSignUp");
+        User currentUser = (User) session.getAttribute("currentUser");
 
         if (pi == null) {
             request.setAttribute("errorMessage", "No registration details found to confirm. Please sign up again.");
@@ -37,6 +39,11 @@ public class ConfirmSignUp extends HttpServlet {
         }
          
         try {
+            // Bind the User entity to PersonalInfoEntity prior to creation
+            if (currentUser != null && pi.getUser() == null) {
+                pi.setUser(currentUser);
+            }
+
             pifl.create(pi); // Persist completed profile entity to database
             
             // Clean up temporary sign-up session attribute
