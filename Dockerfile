@@ -14,6 +14,8 @@ FROM payara/micro:latest
 # Copy WAR artifact directly to deployment directory
 COPY --from=build /app/target/PersonalProfileSystem-1.0-SNAPSHOT.war /opt/payara/deployments/ROOT.war
 
+ENV PORT=8080
 EXPOSE 8080
 
-CMD ["--deploy", "/opt/payara/deployments/ROOT.war", "--contextroot", "/"]
+ENTRYPOINT ["java", "-jar", "/opt/payara/payara-micro.jar"]
+CMD ["--deploy", "/opt/payara/deployments/ROOT.war", "--port", "8080", "--contextroot", "/", "--nocluster", "--disablephonehome"]
