@@ -10,8 +10,8 @@ COPY web ./web
 # Package application WAR artifact
 RUN mvn clean package -DskipTests
 
-# Stage 2: Deploy WAR file to Payara Application Server
+# Stage 2: Deploy WAR file as ROOT application to Payara
 FROM payara/server-full:latest
-COPY --from=build /app/target/PersonalProfileSystem-1.0-SNAPSHOT.war $DEPLOY_DIR/
+COPY --from=build /app/target/PersonalProfileSystem-1.0-SNAPSHOT.war $DEPLOY_DIR/ROOT.war
 
 EXPOSE 8080
