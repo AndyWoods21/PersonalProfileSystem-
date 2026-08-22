@@ -13,7 +13,7 @@ COPY lib ./lib
 RUN ant -f build.xml -Dlibs.CopyLibs.classpath=lib/org-netbeans-modules-java-j2ee-copylibs-manifest.jar
 
 # Stage 2: Deploy to Payara (GlassFish-compatible Java EE Server)
-FROM payara/server-full:6.2023.8-jdk21
+FROM payara/server-full:latest
 COPY --from=build /app/dist/PersonalProfileSystem.war $DEPLOY_DIR/
 
 EXPOSE 8080
