@@ -1,21 +1,17 @@
-# Stage 1: Build the WAR file using Eclipse Temurin JDK 21 and Ant
-FROM eclipse-temurin:21-jdk AS build
-
-# Install Apache Ant
-RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
-
+# Stage 1: Build the WAR package using Maven & Java 21
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy available project source files
-COPY build.xml .
+# Copy pom.xml and source code directories
+COPY pom.xml .
 COPY src ./src
 COPY web ./web
 
-# Execute Ant build task ignoring missing NetBeans tasks
-RUN ant -f build.xml -Dno.deps=true -Dlibs.CopyLibs.classpath=
+# Package application WAR artifact
+RUN mvn clean package -DskipTests
 
-# Stage 2: Deploy to Payara Application Server
+# Stage 2: Deploy WAR file to Payara Application Server
 FROM payara/server-full:latest
-COPY --from=build /app/dist/*.war $DEPLOY_DIR/
+COPY --from=build /app/target/PersonalProfileSystem-1.0-SNAPSHOT.war $DEPLOY_DIR/
 
 EXPOSE 8080
