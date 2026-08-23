@@ -54,8 +54,18 @@
     </dependencies>
 
     <build>
-        <!-- Explicitly point Maven to your Java source files -->
         <sourceDirectory>src/java</sourceDirectory>
+        
+        <!-- Tell Maven to copy non-Java files (persistence.xml) from src/java -->
+        <resources>
+            <resource>
+                <directory>src/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
         
         <plugins>
             <plugin>
@@ -72,7 +82,6 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.2</version>
                 <configuration>
-                    <!-- Explicitly point Maven to your JSP/web assets -->
                     <warSourceDirectory>web</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
