@@ -1,5 +1,5 @@
-# Stage 1: Build application package using Maven & Java 21
-FROM maven:3.9.6-eclipse-temurin-21 AS build
+# Stage 1: Build application package using Maven & Java 8
+FROM maven:3.8.8-eclipse-temurin-8 AS build
 WORKDIR /app
 
 COPY pom.xml .
@@ -8,12 +8,14 @@ COPY web ./web
 
 RUN mvn clean package -DskipTests
 
-# Stage 2: Serve application using Payara Micro
-FROM payara/micro:latest
+# Stage 2: Serve application using Payara Micro 5 (Java EE 7 / javax compatible)
+FROM payara/micro:5.2022.5-jdk8
 
 # Copy WAR artifact directly to deployment directory
 COPY --from=build /app/target/PersonalProfileSystem-1.0-SNAPSHOT.war /opt/payara/deployments/ROOT.war
 
+ENV PORT=8080
 EXPOSE 8080
 
-CMD ["--deploy", "/opt/payara/deployments/ROOT.war", "--port", "8080", "--contextroot", "/"]
+ENTRYPOINT ["java", "-jar", "/opt/payara/payara-micro.jar"]
+CMD ["--deploy", "/opt/payara/deployments/ROOT.war", "--port", "8080", "--contextroot", "/", "--nocluster", "--disablephonehome"]
