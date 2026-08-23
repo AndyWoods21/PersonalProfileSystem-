@@ -18,4 +18,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "/opt/payara/payara-micro.jar"]
-CMD ["--deploy", "/opt/payara/deployments/ROOT.war", "--port", "8080", "--contextroot", "/", "--nocluster", "--disablephonehome"]
+CMD ["java", "-Xms128m", "-Xmx384m", "-jar", "/opt/payara/payara-micro.jar", "--deploy", "/opt/payara/deployments/ROOT.war", "--port", "8080", "--contextroot", "/", "--nocluster", "--disablephonehome"]
