@@ -8,8 +8,8 @@ COPY web ./web
 
 RUN mvn clean package -DskipTests
 
-# Stage 2: Serve application using Payara Micro 5 (Java EE 7 / javax compatible)
-FROM payara/micro:5.2020.2-jdk8
+# Stage 2: Serve application using Payara Micro 5
+FROM payara/micro:5.2022.2
 
 # Copy WAR artifact directly to deployment directory
 COPY --from=build /app/target/PersonalProfileSystem-1.0-SNAPSHOT.war /opt/payara/deployments/ROOT.war
