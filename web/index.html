@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer Profile Dashboard</title>
+    <title>DevProfile — Showcase Your Developer Journey</title>
     <style>
         :root {
             /* Light Glass Theme Palette with Image Background Support */
@@ -137,11 +137,18 @@
         .avatar {
             width: 140px;
             height: 140px;
-            border-radius: 50%;
+            border-radius: var(--radius-md);
             object-fit: cover;
             border: 4px solid #ffffff;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             flex-shrink: 0;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 3rem;
+            font-weight: 800;
         }
 
         .hero-text h1 {
@@ -185,11 +192,22 @@
             transition: all 0.2s ease;
         }
 
+        .social-links a.cta-btn {
+            background: var(--accent-gradient);
+            color: #ffffff;
+            border: none;
+        }
+
         .social-links a:hover {
             background: #ffffff;
             color: var(--accent-color);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .social-links a.cta-btn:hover {
+            color: #ffffff;
+            opacity: 0.95;
         }
 
         /* Dashboard Grid Layout */
@@ -380,7 +398,7 @@
 
         .contact-info strong {
             color: var(--text-dark);
-            width: 80px;
+            width: 100px;
             display: inline-block;
         }
 
@@ -459,18 +477,18 @@
     </header>
 
     <main>
-        <!-- About / Personal Hero Section -->
+        <!-- About / Platform Hero Section -->
         <section id="about">
             <div class="hero">
-                <img src="https://via.placeholder.com/140" alt="Profile Picture" class="avatar">
+                <div class="avatar">&lt;/&gt;</div>
                 <div class="hero-text">
-                    <h1>Jane Doe</h1>
-                    <p class="title">Full Stack Web Developer</p>
-                    <p>Passionate software engineer with 5+ years of experience building accessible, responsive, and performant web applications using modern technologies.</p>
+                    <h1>Build & Share Your Developer Identity</h1>
+                    <p class="title">The Modern Portfolio Dashboard for Engineers</p>
+                    <p>DevProfile empowers developers to showcase their work experience, highlight technical projects, and list verified skills in a clean, glassmorphic interactive dashboard.</p>
                     <div class="social-links">
-                        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
-                        <a href="https://example.com" target="_blank" rel="noopener">Personal Site</a>
+                        <a href="login.jsp" class="cta-btn">Create Your Profile</a>
+                        <a href="#projects">Explore Features</a>
+                        <a href="#contact">Contact Us</a>
                     </div>
                 </div>
             </div>
@@ -482,61 +500,61 @@
             <!-- Left Primary Column -->
             <div class="grid-column">
                 
-                <!-- Work Experience Section -->
+                <!-- Experience Showcase Feature -->
                 <section id="experience">
-                    <h2>Work Experience</h2>
+                    <h2>Experience Showcase</h2>
                     <div class="timeline-item">
                         <div class="timeline-header">
-                            <h3>Senior Frontend Developer — <span>TechCorp Solutions</span></h3>
-                            <span class="timeline-date">2022 - Present</span>
+                            <h3>Interactive Career Timelines — <span>Work History</span></h3>
+                            <span class="timeline-date">Feature 01</span>
                         </div>
                         <ul>
-                            <li>Led a team of 4 developers to rebuild the core dashboard application using React and TypeScript.</li>
-                            <li>Improved website loading speed by 40% through code splitting and asset optimization.</li>
+                            <li>Display your full professional employment history with structured milestone cards.</li>
+                            <li>Highlight key accomplishments, technologies used, and team roles with ease.</li>
                         </ul>
                     </div>
 
                     <div class="timeline-item">
                         <div class="timeline-header">
-                            <h3>Web Developer — <span>Digital Agency Inc.</span></h3>
-                            <span class="timeline-date">2020 - 2022</span>
+                            <h3>Verified Credentials — <span>Trust & Rigor</span></h3>
+                            <span class="timeline-date">Feature 02</span>
                         </div>
                         <ul>
-                            <li>Developed responsive client websites utilizing modern HTML, CSS, JavaScript, and CMS platforms.</li>
-                            <li>Collaborated directly with UI/UX designers to translate Figma mockups into production code.</li>
+                            <li>Link official degree milestones and accredited technical certifications directly.</li>
+                            <li>Provide recruiters and hiring managers with a single source of truth for your developer background.</li>
                         </ul>
                     </div>
                 </section>
 
                 <!-- Featured Projects Section -->
                 <section id="projects">
-                    <h2>Featured Projects</h2>
+                    <h2>Platform Highlights</h2>
                     <div class="card-grid">
                         <div class="card project-card">
-                            <h3>E-Commerce Platform</h3>
-                            <p>A full-featured web application with a shopping cart, secure checkout, and real-time inventory management.</p>
+                            <h3>Project Spotlight</h3>
+                            <p>Organize software repositories, live web application demos, and technical stack badges in structured visual grids.</p>
                             <div class="tags">
-                                <span class="tag">React</span>
-                                <span class="tag">Node.js</span>
-                                <span class="tag">MongoDB</span>
+                                <span class="tag">Live Demos</span>
+                                <span class="tag">GitHub Links</span>
+                                <span class="tag">Tech Badges</span>
                             </div>
                             <div class="project-links">
-                                <a href="#" target="_blank">Live Demo &rarr;</a>
-                                <a href="#" target="_blank">GitHub &rarr;</a>
+                                <a href="login.jsp">Get Started &rarr;</a>
+                                <a href="#skills">View Tech Stack &rarr;</a>
                             </div>
                         </div>
 
                         <div class="card project-card">
-                            <h3>Task Management Dashboard</h3>
-                            <p>A drag-and-drop productivity dashboard designed for remote teams to manage project deliverables.</p>
+                            <h3>Recommendation Engine</h3>
+                            <p>Collect authentic testimonials and peer reviews from managers, tech leads, and client collaborators.</p>
                             <div class="tags">
-                                <span class="tag">Vue.js</span>
-                                <span class="tag">Firebase</span>
-                                <span class="tag">Tailwind CSS</span>
+                                <span class="tag">Peer Reviews</span>
+                                <span class="tag">Manager Endorsements</span>
+                                <span class="tag">Client Quotes</span>
                             </div>
                             <div class="project-links">
-                                <a href="#" target="_blank">Live Demo &rarr;</a>
-                                <a href="#" target="_blank">GitHub &rarr;</a>
+                                <a href="login.jsp">Learn More &rarr;</a>
+                                <a href="#contact">Inquire &rarr;</a>
                             </div>
                         </div>
                     </div>
@@ -544,19 +562,19 @@
 
                 <!-- Professional References Section -->
                 <section id="references">
-                    <h2>References</h2>
+                    <h2>User Testimonials</h2>
                     <div class="card-grid">
                         <div class="card">
-                            <h3>John Smith</h3>
-                            <p style="color: var(--accent-color); font-size: 0.85rem; font-weight: 600;">Engineering Manager at TechCorp</p>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">"Jane is an exceptional developer who consistently delivers clean, efficient code and collaborates well across teams."</p>
-                            <p style="margin-top: 0.75rem; font-size: 0.85rem;"><strong>Email:</strong> j.smith@example.com</p>
+                            <h3>Alex Rivera</h3>
+                            <p style="color: var(--accent-color); font-size: 0.85rem; font-weight: 600;">Full Stack Engineer</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">"DevProfile gave me a clean, professional dashboard that made sharing my work with recruiters seamless and quick."</p>
+                            <p style="margin-top: 0.75rem; font-size: 0.85rem;"><strong>Status:</strong> Verified Member</p>
                         </div>
                         <div class="card">
-                            <h3>Sarah Lee</h3>
-                            <p style="color: var(--accent-color); font-size: 0.85rem; font-weight: 600;">Lead Designer at Digital Agency</p>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">"A developer with a rare eye for design fidelity and seamless UI interactions."</p>
-                            <p style="margin-top: 0.75rem; font-size: 0.85rem;"><strong>Email:</strong> s.lee@example.com</p>
+                            <h3>Elena Rostova</h3>
+                            <p style="color: var(--accent-color); font-size: 0.85rem; font-weight: 600;">Technical Recruiter</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">"Reviewing candidate profiles built on DevProfile is a breath of fresh air compared to traditional PDF resumes."</p>
+                            <p style="margin-top: 0.75rem; font-size: 0.85rem;"><strong>Status:</strong> Enterprise Partner</p>
                         </div>
                     </div>
                 </section>
@@ -568,13 +586,12 @@
                 
                 <!-- Skills Section -->
                 <section id="skills">
-                    <h2>Skills</h2>
+                    <h2>Supported Skills</h2>
                     <div class="card">
                         <div class="skill-group">
-                            <h3>Frontend</h3>
+                            <h3>Frontend Stack</h3>
                             <div class="tags">
-                                <span class="tag">HTML5</span>
-                                <span class="tag">CSS3 / SASS</span>
+                                <span class="tag">HTML5 / CSS3</span>
                                 <span class="tag">JavaScript</span>
                                 <span class="tag">TypeScript</span>
                                 <span class="tag">React</span>
@@ -582,22 +599,22 @@
                             </div>
                         </div>
                         <div class="skill-group">
-                            <h3>Backend & Databases</h3>
+                            <h3>Backend & DBs</h3>
                             <div class="tags">
+                                <span class="tag">Java / Jakarta EE</span>
+                                <span class="tag">Spring Boot</span>
                                 <span class="tag">Node.js</span>
-                                <span class="tag">Express</span>
                                 <span class="tag">Python</span>
-                                <span class="tag">PostgreSQL</span>
-                                <span class="tag">MongoDB</span>
+                                <span class="tag">SQL Databases</span>
                             </div>
                         </div>
                         <div class="skill-group">
-                            <h3>Tools & Workflow</h3>
+                            <h3>DevOps & Tools</h3>
                             <div class="tags">
                                 <span class="tag">Git & GitHub</span>
                                 <span class="tag">Docker</span>
-                                <span class="tag">REST APIs</span>
-                                <span class="tag">CI/CD</span>
+                                <span class="tag">RESTful APIs</span>
+                                <span class="tag">Maven</span>
                             </div>
                         </div>
                     </div>
@@ -605,13 +622,13 @@
 
                 <!-- Education Section -->
                 <section id="education">
-                    <h2>Education</h2>
+                    <h2>Education & Academic Tracking</h2>
                     <div class="timeline-item">
                         <div class="timeline-header">
-                            <h3>B.S. in Computer Science</h3>
-                            <span class="timeline-date">2016 - 2020</span>
+                            <h3>Degree & Coursework Logging</h3>
+                            <span class="timeline-date">Academic Hub</span>
                         </div>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">State University — Graduated with Honors.</p>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Structure module outcomes, honors degrees, and university projects in an organized format.</p>
                     </div>
                 </section>
 
@@ -620,23 +637,23 @@
                     <h2>Certifications</h2>
                     <div class="card" style="display: flex; flex-direction: column; gap: 1.25rem;">
                         <div>
-                            <h3 style="font-size: 1rem; font-weight: 700;">AWS Certified Developer</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem;">Amazon Web Services — 2023</p>
+                            <h3 style="font-size: 1rem; font-weight: 700;">Cloud & Architecture Credentials</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">AWS, Azure, and Google Cloud Badges</p>
                         </div>
                         <div style="border-top: 1px solid var(--glass-border); padding-top: 1.25rem;">
-                            <h3 style="font-size: 1rem; font-weight: 700;">Meta Front-End Developer</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem;">Coursera — 2021</p>
+                            <h3 style="font-size: 1rem; font-weight: 700;">Developer Certificates</h3>
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">Meta, Coursera, and Oracle Integrations</p>
                         </div>
                     </div>
                 </section>
 
                 <!-- Contact Section -->
                 <section id="contact">
-                    <h2>Contact Information</h2>
+                    <h2>Get in Touch</h2>
                     <div class="card contact-info">
-                        <p><strong>Email:</strong> jane.doe@example.com</p>
-                        <p><strong>Phone:</strong> +1 (555) 019-2834</p>
-                        <p><strong>Location:</strong> San Francisco, CA</p>
+                        <p><strong>Support:</strong> support@devprofile.com</p>
+                        <p><strong>Inquiries:</strong> hello@devprofile.com</p>
+                        <p><strong>Platform:</strong> DevProfile Web App</p>
                     </div>
                 </section>
 
@@ -646,7 +663,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Jane Doe. All rights reserved.</p>
+        <p>&copy; 2026 DevProfile Platform. All rights reserved.</p>
     </footer>
 
 </body>
