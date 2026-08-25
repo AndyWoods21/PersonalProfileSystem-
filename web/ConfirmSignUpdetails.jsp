@@ -1,36 +1,44 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="za.ac.org.User" %>
-<%@ page import="za.ac.org.PersonalInfoEntity" %>
-<%
-    // Retrieve objects stored in the session by SignUpServlet and AddInformationServlet
-    User user = (User) session.getAttribute("currentUser");
-    PersonalInfoEntity pi = (PersonalInfoEntity) session.getAttribute("PersonalInfo");
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-    // Fallbacks to prevent NullPointerExceptions if session expired or was bypassed
-    String username = (user != null && user.getUsername() != null) ? user.getUsername() : "N/A";
-    String fullName = (pi != null && pi.getFullname() != null) ? pi.getFullname() : "N/A";
-    String email = (pi != null && pi.getEmail() != null) ? pi.getEmail() : "N/A";
-    String jobTitle = (pi != null && pi.getJobTitle() != null && !pi.getJobTitle().isEmpty()) ? pi.getJobTitle() : "Not specified";
-    String location = (pi != null && pi.getLocation() != null && !pi.getLocation().isEmpty()) ? pi.getLocation() : "Not specified";
-    String bio = (pi != null && pi.getProfessionalSummary() != null && !pi.getProfessionalSummary().isEmpty()) ? pi.getProfessionalSummary() : "No bio provided.";
-%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Your Registration Details</title>
+    <title>Complete Profile Information — DevProfile</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --border-color: #334155;
-            --success-color: #22c55e;
-            --success-bg: rgba(34, 197, 94, 0.1);
+            /* Shared Light Glass Theme Palette from Index */
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-bg-hover: rgba(255, 255, 255, 0.82);
+            --glass-border: rgba(255, 255, 255, 0.7);
+            --glass-header: rgba(255, 255, 255, 0.75);
+            
+            /* Text & Accent Tokens */
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --accent-color: #2563eb;
+            --accent-gradient: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%);
+            --accent-light: rgba(37, 99, 235, 0.12);
+            
+            /* Elevation & Blur */
+            --glass-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.12);
+            --glass-blur: blur(18px);
+            
+            /* Input & Error Tokens */
+            --input-bg: rgba(255, 255, 255, 0.75);
+            --input-border: rgba(255, 255, 255, 0.8);
+            --input-readonly-bg: rgba(241, 245, 249, 0.5);
+            --error-color: #dc2626;
+            --error-bg: rgba(254, 226, 226, 0.75);
+            --error-border: rgba(248, 113, 113, 0.6);
+            
+            /* Radii */
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-pill: 9999px;
         }
 
         * {
@@ -41,171 +49,337 @@
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background: linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.35)), url('${pageContext.request.contextPath}/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-dark);
+            line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Navigation Header Matching Index */
+        header {
+            position: sticky;
+            top: 0;
+            background: var(--glass-header);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        nav {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            gap: 1rem;
+        }
+
+        nav .logo {
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -0.5px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        nav a.nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        nav a.nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        /* Main Wrapper */
+        main {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem 1rem;
+            padding: 3rem 1.5rem;
         }
 
-        .confirm-container {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+        /* Outer Glass Container */
+        .profile-container {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 550px;
-            padding: 2.5rem 2rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            max-width: 580px;
+            padding: 2.5rem;
+            box-shadow: var(--glass-shadow);
+            transition: all 0.25s ease;
         }
 
-        .confirm-header {
+        .profile-header {
             text-align: center;
             margin-bottom: 2rem;
         }
 
-        .confirm-header h1 {
-            font-size: 1.6rem;
-            color: var(--text-color);
+        .profile-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-dark);
             margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
         }
 
-        .confirm-header p {
+        .profile-header p {
             color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .alert-error {
+            background-color: var(--error-bg);
+            border: 1px solid var(--error-border);
+            color: var(--error-color);
+            padding: 0.85rem 1.1rem;
+            border-radius: var(--radius-sm);
             font-size: 0.9rem;
-        }
-
-        .details-group {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.25rem;
+            font-weight: 600;
             margin-bottom: 1.5rem;
-        }
-
-        .details-group h2 {
-            font-size: 1.1rem;
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-            padding-bottom: 0.4rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .detail-item {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            font-size: 0.925rem;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
         }
 
-        .detail-item:last-child {
-            margin-bottom: 0;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
         }
 
-        .detail-label {
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        /* Glass Form Inputs */
+        input[type="text"],
+        input[type="email"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--input-bg);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid var(--input-border);
+            border-radius: var(--radius-sm);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        input[readonly] {
+            background: var(--input-readonly-bg);
             color: var(--text-muted);
-            font-weight: 500;
+            cursor: not-allowed;
+            border-style: dashed;
         }
 
-        .detail-value {
-            color: var(--text-color);
-            font-weight: 600;
-            text-align: right;
-            max-width: 60%;
-            word-break: break-word;
+        input:focus:not([readonly]),
+        textarea:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
 
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
+        textarea {
+            resize: vertical;
+            min-height: 100px;
         }
 
-        .btn {
-            flex: 1;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
+        /* Primary CTA Button with Accent Gradient */
+        .btn-submit {
+            width: 100%;
+            padding: 0.9rem 1.25rem;
+            background: var(--accent-gradient);
+            color: #ffffff;
             border: none;
+            border-radius: var(--radius-pill);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            transition: all 0.25s ease;
+            margin-top: 0.5rem;
         }
 
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
+        .btn-submit:hover {
+            opacity: 0.95;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+            transform: translateY(-2px);
         }
 
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
+        .skip-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.25rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: color 0.2s;
         }
 
-        .btn-secondary:hover {
-            background-color: var(--border-color);
+        .skip-link:hover {
+            color: var(--accent-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-container {
+                padding: 1.75rem 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="confirm-container">
-        <div class="confirm-header">
-            <h1>Confirm Details</h1>
-            <p>Please review your information before completing account creation.</p>
-        </div>
+    <!-- Header / Navigation Matching Index -->
+    <header>
+        <nav>
+            <a href="${pageContext.request.contextPath}/" class="logo">DevProfile</a>
+            <a href="${pageContext.request.contextPath}/" class="nav-link">&larr; Back to Home</a>
+        </nav>
+    </header>
 
-        <!-- Account Credentials Section -->
-        <div class="details-group">
-            <h2>Account Details</h2>
-            <div class="detail-item">
-                <span class="detail-label">Username:</span>
-                <span class="detail-value"><%= username %></span>
+    <main>
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1>Complete Your Profile</h1>
+                <p>Tell us a bit more about yourself to customize your space.</p>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">Email Address:</span>
-                <span class="detail-value"><%= email %></span>
-            </div>
-        </div>
 
-        <!-- Personal Info Section -->
-        <div class="details-group">
-            <h2>Personal & Professional Details</h2>
-            <div class="detail-item">
-                <span class="detail-label">Full Name:</span>
-                <span class="detail-value"><%= fullName %></span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Title / Role:</span>
-                <span class="detail-value"><%= jobTitle %></span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Location:</span>
-                <span class="detail-value"><%= location %></span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Bio:</span>
-                <span class="detail-value"><%= bio %></span>
-            </div>
-        </div>
+            <%-- Declarative Error Banner --%>
+            <c:if test="${not empty requestScope.errorMessage}">
+                <div class="alert-error">
+                    <span>⚠️ <c:out value="${requestScope.errorMessage}" /></span>
+                </div>
+            </c:if>
 
-        <!-- Action Buttons -->
-        <div class="btn-group">
-            <!-- Navigate back to AddInformation.jsp if user wants to edit -->
-            <a href="ConfirmSignUp.do" class="btn btn-secondary">&larr; Edit Details</a>
+            <form action="${pageContext.request.contextPath}/AddInformationServlet.do" method="POST" id="infoForm">
+                
+                <!-- Pre-filled & Read-only section from Session -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="fullName" 
+                            value="<c:out value='${sessionScope.PersonalInfo.fullname}' />" 
+                            readonly 
+                            title="Set during registration"
+                        />
+                    </div>
 
-            <!-- Final submission to complete profile process -->
-            <a href="${pageContext.request.contextPath}/login.jsp?success=true" class="btn btn-primary">Finish & Login &rarr;</a>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            value="<c:out value='${sessionScope.PersonalInfo.email}' />" 
+                            readonly 
+                            title="Set during registration"
+                        />
+                    </div>
+                </div>
+
+                <!-- Additional Details to Complete Profile -->
+                <div class="form-group">
+                    <label for="title">Professional Title / Role</label>
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title" 
+                        value="<c:out value='${sessionScope.PersonalInfo.jobTitle}' />"
+                        placeholder="e.g. Full-Stack Developer / Student" 
+                        required 
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input 
+                        type="text" 
+                        id="location" 
+                        name="location" 
+                        value="<c:out value='${sessionScope.PersonalInfo.location}' />"
+                        placeholder="e.g. Johannesburg, South Africa" 
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">Short Bio</label>
+                    <textarea 
+                        id="bio" 
+                        name="bio" 
+                        placeholder="Write a brief introduction about your skills and interests..."
+                    ><c:out value="${sessionScope.PersonalInfo.professionalSummary}" /></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="website">Portfolio / Website Link</label>
+                    <input 
+                        type="url" 
+                        id="website" 
+                        name="website" 
+                        value="<c:out value='${sessionScope.PersonalInfo.websiteUrl}' />"
+                        placeholder="https://yourportfolio.com" 
+                    />
+                </div>
+
+                <button type="submit" class="btn-submit">Save & Complete Profile &rarr;</button>
+            </form>
+
+            <a href="${pageContext.request.contextPath}/" class="skip-link">Skip for now &rarr;</a>
         </div>
-    </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DevProfile Platform. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>
