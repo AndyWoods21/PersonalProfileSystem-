@@ -33,6 +33,7 @@ public class AddInformationServlet extends HttpServlet {
         String title = request.getParameter("title");
         String location = request.getParameter("location");
         String bio = request.getParameter("bio");
+        String website = request.getParameter("website");
 
         Boolean isRegisteredUser = (Boolean) session.getAttribute("isRegistered");
         PersonalInfoEntity pi = null;
@@ -41,9 +42,11 @@ public class AddInformationServlet extends HttpServlet {
         if (Boolean.TRUE.equals(isRegisteredUser)) {
             pi = (PersonalInfoEntity) session.getAttribute("PersonalInfo");
         } else {
-            pi = (PersonalInfoEntity) session.getAttribute("NewSignUp");
+            pi = (PersonalInfoEntity) session.getAttribute("PersonalInfo");
             if (pi == null) {
-                // Initialize if navigating from initial sign-up step
+                pi = (PersonalInfoEntity) session.getAttribute("NewSignUp");
+            }
+            if (pi == null) {
                 pi = new PersonalInfoEntity();
             }
         }
@@ -62,6 +65,11 @@ public class AddInformationServlet extends HttpServlet {
         pi.setLocation(location != null ? location.trim() : "");
         pi.setProfessionalSummary(bio != null ? bio.trim() : "");
         
+        // Map website parameter to entity field
+        if (website != null) {
+            pi.setWebsiteUrl(website.trim());
+        }
+
         // Link target user entity if available
         if (currentUser != null && pi.getUser() == null) {
             pi.setUser(currentUser);
@@ -76,13 +84,14 @@ public class AddInformationServlet extends HttpServlet {
                 return;
             } catch (Exception e) {
                 getServletContext().log("Error updating user profile", e);
-                request.setAttribute("errorMessage", "Could not update profile details.");
+                request.setAttribute("errorMessage", "Could not update profile details: " + e.getMessage());
                 request.getRequestDispatcher("AddInformation.jsp").forward(request, response);
                 return;
             }
         }
 
         // Flow 2: Unconfirmed Sign-Up Registration
+        session.setAttribute("PersonalInfo", pi);
         session.setAttribute("NewSignUp", pi);
         RequestDispatcher disp = request.getRequestDispatcher("ConfirmSignUpdetails.jsp");
         disp.forward(request, response);
