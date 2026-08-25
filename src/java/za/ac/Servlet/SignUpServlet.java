@@ -57,24 +57,31 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        // Create initial entity instances
-        User user = createUser(username, password);
-        PersonalInfoEntity pi = createPI(fullName, email);
-        pi.setUser(user);
-
         try {
-            ufl.create(user); // Persist new user account
-            
-            // Store created entities in session for step 2 (AddInformation.jsp)
-            session.setAttribute("currentUser", user);
+            // 1. Create and persist User entity first to obtain a generated primary key
+            User user = createUser(username, password);
+            ufl.create(user);
+
+            // 2. Fetch managed User instance to guarantee persistence state
+            User savedUser = ufl.findByUsername(username);
+
+            // 3. Create and link PersonalInfoEntity with saved User
+            PersonalInfoEntity pi = createPI(fullName, email);
+            pi.setUser(savedUser);
+
+            // 4. Persist PersonalInfoEntity explicitly using its own facade
+            pifl.create(pi);
+
+            // 5. Update session attributes for multi-step onboarding (AddInformation.jsp)
+            session.setAttribute("currentUser", savedUser);
             session.setAttribute("PersonalInfo", pi);
-            session.setAttribute("isRegistered", false); // Unconfirmed sign-up state
+            session.setAttribute("isRegistered", true);
 
             RequestDispatcher disp = request.getRequestDispatcher("AddInformation.jsp");
             disp.forward(request, response);
         } catch (Exception e) {
             log("Error during registration process", e);
-            request.setAttribute("errorMessage", "Database error occurred during registration.");
+            request.setAttribute("errorMessage", "Database error occurred during registration: " + e.getMessage());
             request.getRequestDispatcher("signUp.jsp").forward(request, response);
         }
     }
