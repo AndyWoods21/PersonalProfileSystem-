@@ -15,7 +15,7 @@
     
     <!-- Client-Side PDF Generation Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+<style>
     :root {
     --bg-main: rgba(255, 255, 255, 0.95);
     --bg-gray: #F8FAFC;
@@ -579,6 +579,7 @@ footer {
         justify-content: center;
     }
 }
+</style>
 </head>
 <body>
 
