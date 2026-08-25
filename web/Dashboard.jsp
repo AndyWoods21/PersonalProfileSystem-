@@ -11,7 +11,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard — <c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : 'Not Provided'}" /></title>
+    <title>User Dashboard — <c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : sessionScope.currentUser.username}" /></title>
+    
+    <!-- Client-Side PDF Generation Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root {
             --bg-main: rgba(255, 255, 255, 0.95);
@@ -95,10 +99,21 @@
             font-weight: 600;
             text-decoration: none;
             transition: opacity 0.2s;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
         .btn-action-sm:hover {
             opacity: 0.9;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #0284C7, #2563EB);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
         }
 
         .btn-logout {
@@ -116,6 +131,11 @@
         .btn-logout:hover {
             background-color: var(--danger-color);
             color: #FFFFFF;
+        }
+
+        .not-provided {
+            color: #94A3B8;
+            font-style: italic;
         }
 
         /* App Layout Container */
@@ -304,6 +324,7 @@
             margin-top: 1.75rem;
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         /* Footer */
@@ -317,6 +338,171 @@
             margin-top: auto;
             backdrop-filter: blur(8px);
         }
+
+        /* ==========================================================
+           HIGH-VISIBILITY PROFESSIONAL CV TEMPLATE FOR PDF EXPORT
+           ========================================================== */
+        #cv-pdf-wrapper {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 794px; /* A4 Width at standard DPI */
+        }
+
+        .cv-template {
+            background-color: #ffffff;
+            color: #1e293b;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            box-sizing: border-box;
+            min-height: 1122px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cv-header-bar {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 35px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid #0284c7;
+        }
+
+        .cv-name-title h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .cv-name-title .cv-subtitle {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .cv-header-contact {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .cv-body-layout {
+            display: flex;
+            flex: 1;
+        }
+
+        .cv-col-left {
+            width: 32%;
+            background-color: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .cv-col-right {
+            width: 68%;
+            padding: 30px 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+            background-color: #ffffff;
+        }
+
+        .cv-section-title {
+            font-size: 1.1rem;
+            color: #0f172a;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #0284c7;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+        }
+
+        .cv-text-p {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .cv-timeline-item {
+            margin-bottom: 16px;
+        }
+
+        .cv-timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .cv-timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 2px;
+        }
+
+        .cv-timeline-role {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .cv-timeline-date {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0284c7;
+        }
+
+        .cv-timeline-org {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .cv-skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .cv-skill-pill {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .cv-list-simple {
+            list-style: none;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #334155;
+        }
+
+        .cv-list-simple li {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .cv-list-simple li:last-child {
+            border-bottom: none;
+        }
+
+        .cv-not-provided {
+            color: #94a3b8;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -326,6 +512,7 @@
         <a href="${pageContext.request.contextPath}/Dashboard.jsp" class="logo">DevProfile Management</a>
         <div class="user-nav">
             <span class="badge"><c:out value="${sessionScope.currentUser.role}" /></span>
+            <button onclick="downloadCV()" class="btn-action-sm btn-print">📄 Print CV (PDF)</button>
             <a href="${pageContext.request.contextPath}/PublicProfileServlet.do?user=${sessionScope.currentUser.username}" target="_blank" class="btn-action-sm">View Public Profile ↗</a>
             <a href="${pageContext.request.contextPath}/LogoutServlet.do" class="btn-logout">Log Out</a>
         </div>
@@ -376,10 +563,22 @@
             <!-- Welcome Banner -->
             <div class="welcome-card">
                 <div class="welcome-text">
-                    <h1>Welcome back, <c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : 'Not Provided'}" />!</h1>
+                    <h1>
+                        Welcome back, 
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.fullname}">
+                                <c:out value="${sessionScope.PersonalInfo.fullname}" />
+                            </c:when>
+                            <c:otherwise>
+                                <c:out value="${sessionScope.currentUser.username}" />
+                            </c:otherwise>
+                        </c:choose>!
+                    </h1>
                     <p>Manage your account settings and profile information from your personal dashboard.</p>
                 </div>
-                <a href="${pageContext.request.contextPath}/EditInfoServlet.do" class="btn-action-sm">Edit Profile &rarr;</a>
+                <div>
+                    <a href="${pageContext.request.contextPath}/EditInfoServlet.do" class="btn-action-sm">Edit Profile &rarr;</a>
+                </div>
             </div>
 
             <div class="dashboard-grid">
@@ -388,15 +587,42 @@
                     <h2>Account Information</h2>
                     <div class="info-row">
                         <span class="info-label">Username</span>
-                        <span class="info-value"><c:out value="${sessionScope.currentUser.username}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.currentUser and not empty sessionScope.currentUser.username}">
+                                    <c:out value="${sessionScope.currentUser.username}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Email Address</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.email ? sessionScope.PersonalInfo.email : 'Not Provided'}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.email}">
+                                    <c:out value="${sessionScope.PersonalInfo.email}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Account Role</span>
-                        <span class="info-value"><c:out value="${sessionScope.currentUser.role}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.currentUser and not empty sessionScope.currentUser.role}">
+                                    <c:out value="${sessionScope.currentUser.role}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                 </div>
 
@@ -405,19 +631,81 @@
                     <h2>Profile Details</h2>
                     <div class="info-row">
                         <span class="info-label">Full Name</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : 'Not Provided'}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.fullname}">
+                                    <c:out value="${sessionScope.PersonalInfo.fullname}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.phone}">
+                                    <c:out value="${sessionScope.PersonalInfo.phone}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Professional Title / Role</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.jobTitle ? sessionScope.PersonalInfo.jobTitle : 'No title specified'}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.jobTitle}">
+                                    <c:out value="${sessionScope.PersonalInfo.jobTitle}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Location</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.location ? sessionScope.PersonalInfo.location : 'No location specified'}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.location}">
+                                    <c:out value="${sessionScope.PersonalInfo.location}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Website / Portfolio</span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.websiteUrl}">
+                                    <c:out value="${sessionScope.PersonalInfo.websiteUrl}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Professional Bio / Summary</span>
-                        <span class="info-value"><c:out value="${not empty sessionScope.PersonalInfo.professionalSummary ? sessionScope.PersonalInfo.professionalSummary : 'No summary added yet.'}" /></span>
+                        <span class="info-value">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.professionalSummary}">
+                                    <c:out value="${sessionScope.PersonalInfo.professionalSummary}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </span>
                     </div>
 
                     <div class="card-actions">
@@ -428,9 +716,265 @@
         </main>
     </div>
 
+    <!-- High-Visibility PDF Output Printable Template -->
+    <div id="cv-pdf-wrapper">
+        <div class="cv-template" id="cv-content">
+            <!-- Header Block -->
+            <div class="cv-header-bar">
+                <div class="cv-name-title">
+                    <h1>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.fullname}">
+                                <c:out value="${sessionScope.PersonalInfo.fullname}" />
+                            </c:when>
+                            <c:when test="${not empty sessionScope.currentUser and not empty sessionScope.currentUser.username}">
+                                <c:out value="${sessionScope.currentUser.username}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="cv-not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </h1>
+                    <div class="cv-subtitle">
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.jobTitle}">
+                                <c:out value="${sessionScope.PersonalInfo.jobTitle}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="cv-not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+                <div class="cv-header-contact">
+                    <p>📍 Location: 
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.location}">
+                                <c:out value="${sessionScope.PersonalInfo.location}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="cv-not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <p>📧 Email: 
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.email}">
+                                <c:out value="${sessionScope.PersonalInfo.email}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="cv-not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <p>📞 Phone: 
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.phone}">
+                                <c:out value="${sessionScope.PersonalInfo.phone}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="cv-not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <p>🌐 Portfolio: 
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.websiteUrl}">
+                                <c:out value="${sessionScope.PersonalInfo.websiteUrl}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="cv-not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Two Column Body -->
+            <div class="cv-body-layout">
+                <!-- Left Sidebar Column -->
+                <div class="cv-col-left">
+                    <div>
+                        <div class="cv-section-title">Skills</div>
+                        <div class="cv-skills-grid">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.skillsList}">
+                                    <c:forEach items="${sessionScope.skillsList}" var="skill">
+                                        <span class="cv-skill-pill">
+                                            <c:out value="${not empty skill.skillName ? skill.skillName : 'Skill'}" />
+                                            <c:if test="${not empty skill.proficiencyLevel}">
+                                                • <c:out value="${skill.proficiencyLevel}" />
+                                            </c:if>
+                                        </span>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="cv-not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="cv-section-title">Certifications</div>
+                        <ul class="cv-list-simple">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.certificationsList}">
+                                    <c:forEach items="${sessionScope.certificationsList}" var="cert">
+                                        <li>
+                                            <strong><c:out value="${not empty cert.title ? cert.title : 'Certification Title'}" /></strong><br/>
+                                            <span style="color: #64748b;">
+                                                <c:out value="${not empty cert.issuingOrganization ? cert.issuingOrganization : 'Organization N/A'}" />
+                                            </span><br/>
+                                            <small style="color: #0284c7;">
+                                                Issued: <c:out value="${not empty cert.issueDate ? cert.issueDate : 'Date N/A'}" />
+                                            </small>
+                                        </li>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <li><span class="cv-not-provided">Information not provided</span></li>
+                                </c:otherwise>
+                            </c:choose>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <div class="cv-section-title">References</div>
+                        <ul class="cv-list-simple">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.referencesList}">
+                                    <c:forEach items="${sessionScope.referencesList}" var="ref">
+                                        <li>
+                                            <strong><c:out value="${not empty ref.name ? ref.name : 'Reference Name'}" /></strong><br/>
+                                            <span style="color: #0f172a; font-weight: 600;">
+                                                <c:out value="${not empty ref.jobTitle ? ref.jobTitle : ''}" />
+                                                <c:if test="${not empty ref.company}"> @ <c:out value="${ref.company}" /></c:if>
+                                            </span><br/>
+                                            <span style="color: #64748b;">
+                                                <c:out value="${not empty ref.email ? ref.email : (not empty ref.contact ? ref.contact : 'Contact N/A')}" />
+                                            </span>
+                                            <c:if test="${not empty ref.testimonial}">
+                                                <div style="font-style: italic; font-size: 0.8rem; margin-top: 4px; color: #475569;">
+                                                    "<c:out value="${ref.testimonial}" />"
+                                                </div>
+                                            </c:if>
+                                        </li>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <li><span class="cv-not-provided">Information not provided</span></li>
+                                </c:otherwise>
+                            </c:choose>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Main Content Column -->
+                <div class="cv-col-right">
+                    <div>
+                        <div class="cv-section-title">Professional Summary</div>
+                        <p class="cv-text-p">
+                            <c:choose>
+                                <c:when test="${not empty sessionScope.PersonalInfo and not empty sessionScope.PersonalInfo.professionalSummary}">
+                                    <c:out value="${sessionScope.PersonalInfo.professionalSummary}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="cv-not-provided">Information not provided</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="cv-section-title">Work Experience</div>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.workExperienceList}">
+                                <c:forEach items="${sessionScope.workExperienceList}" var="work">
+                                    <div class="cv-timeline-item">
+                                        <div class="cv-timeline-header">
+                                            <div class="cv-timeline-role">
+                                                <c:out value="${not empty work.jobTitle ? work.jobTitle : 'Title Unspecified'}" />
+                                            </div>
+                                            <div class="cv-timeline-date">
+                                                <c:out value="${not empty work.startDate ? work.startDate : 'N/A'}" /> — 
+                                                <c:out value="${not empty work.endDate ? work.endDate : 'Present'}" />
+                                            </div>
+                                        </div>
+                                        <div class="cv-timeline-org">
+                                            <c:out value="${not empty work.companyName ? work.companyName : 'Company Unspecified'}" />
+                                        </div>
+                                        <div class="cv-text-p">
+                                            <c:choose>
+                                                <c:when test="${not empty work.description}">
+                                                    <c:out value="${work.description}" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="cv-not-provided">Information not provided</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="cv-not-provided">Information not provided</p>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div>
+                        <div class="cv-section-title">Education</div>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.educationList}">
+                                <c:forEach items="${sessionScope.educationList}" var="edu">
+                                    <div class="cv-timeline-item">
+                                        <div class="cv-timeline-header">
+                                            <div class="cv-timeline-role">
+                                                <c:out value="${not empty edu.degree ? edu.degree : 'Degree Unspecified'}" />
+                                                <c:if test="${not empty edu.fieldOfStudy}"> in <c:out value="${edu.fieldOfStudy}" /></c:if>
+                                            </div>
+                                            <div class="cv-timeline-date">
+                                                <c:out value="${not empty edu.startDate ? edu.startDate : (not empty edu.startYear ? edu.startYear : 'N/A')}" /> — 
+                                                <c:out value="${not empty edu.endDate ? edu.endDate : (not empty edu.endYear ? edu.endYear : 'N/A')}" />
+                                            </div>
+                                        </div>
+                                        <div class="cv-timeline-org">
+                                            <c:out value="${not empty edu.institutionName ? edu.institutionName : (not empty edu.institution ? edu.institution : 'Institution Unspecified')}" />
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="cv-not-provided">Information not provided</p>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 DevProfile. All rights reserved.</p>
     </footer>
 
+    <!-- JavaScript PDF Generator Trigger -->
+    <script>
+        function downloadCV() {
+            const element = document.getElementById('cv-content');
+            const userName = "${not empty sessionScope.PersonalInfo.fullname ? sessionScope.PersonalInfo.fullname : sessionScope.currentUser.username}";
+            
+            const opt = {
+                margin:       0,
+                filename:     userName.replace(/\s+/g, '_') + '_CV.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'pt', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
 </body>
 </html>
