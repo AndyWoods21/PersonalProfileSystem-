@@ -59,6 +59,7 @@
                 top: 0;
                 z-index: 100;
                 backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
             }
 
             .logo {
@@ -73,6 +74,7 @@
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
+                flex-wrap: wrap;
             }
 
             .badge {
@@ -89,12 +91,15 @@
             .btn-action-sm {
                 background-color: var(--navy-cta);
                 color: #FFFFFF;
-                padding: 0.45rem 0.9rem;
+                padding: 0.5rem 1rem;
                 border-radius: var(--radius-pill);
                 font-size: 0.85rem;
                 font-weight: 600;
                 text-decoration: none;
                 transition: opacity 0.2s;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .btn-action-sm:hover {
@@ -105,12 +110,15 @@
                 background-color: transparent;
                 color: var(--danger-color);
                 border: 1px solid var(--danger-color);
-                padding: 0.4rem 0.85rem;
+                padding: 0.45rem 0.9rem;
                 border-radius: var(--radius-pill);
                 font-size: 0.85rem;
                 font-weight: 600;
                 text-decoration: none;
                 transition: all 0.2s;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .btn-logout:hover {
@@ -138,6 +146,7 @@
                 gap: 1.75rem;
                 flex-shrink: 0;
                 backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
             }
 
             .sidebar-section-title {
@@ -161,7 +170,7 @@
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
-                padding: 0.65rem 0.85rem;
+                padding: 0.75rem 0.85rem;
                 color: var(--text-dark);
                 text-decoration: none;
                 font-size: 0.9rem;
@@ -195,6 +204,7 @@
                 margin-bottom: 1.75rem;
                 box-shadow: var(--shadow-soft);
                 backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
             }
 
             .page-header-card h1 {
@@ -223,6 +233,7 @@
                 padding: 1.75rem;
                 box-shadow: var(--shadow-soft);
                 backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -278,7 +289,7 @@
                 text-align: center;
                 background-color: var(--navy-cta);
                 color: #FFFFFF;
-                padding: 0.55rem 1rem;
+                padding: 0.65rem 1rem;
                 border-radius: var(--radius-pill);
                 text-decoration: none;
                 font-size: 0.875rem;
@@ -299,24 +310,13 @@
                 color: var(--text-muted);
                 box-shadow: var(--shadow-soft);
                 backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
             }
 
             .empty-state h3 {
                 font-size: 1.25rem;
                 color: var(--text-dark);
                 margin-bottom: 0.5rem;
-            }
-
-            /* Responsive Layout Adjustments */
-            @media (max-width: 900px) {
-                .app-container {
-                    flex-direction: column;
-                }
-                .sidebar {
-                    width: 100%;
-                    border-right: none;
-                    border-bottom: 1px solid var(--border-color);
-                }
             }
 
             /* Footer */
@@ -329,6 +329,92 @@
                 font-size: 0.85rem;
                 margin-top: auto;
                 backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }
+
+            /* ==========================================================
+               MOBILE RESPONSIVE BREAKPOINTS
+               ========================================================== */
+
+            /* Tablet & Mobile Layout Adjustment */
+            @media (max-width: 900px) {
+                .app-container {
+                    flex-direction: column;
+                }
+
+                .sidebar {
+                    width: 100%;
+                    border-right: none;
+                    border-bottom: 1px solid var(--border-color);
+                    padding: 1.25rem;
+                    gap: 1.25rem;
+                }
+
+                .nav-menu {
+                    flex-direction: row;
+                    overflow-x: auto;
+                    padding-bottom: 0.5rem;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                .nav-item {
+                    flex-shrink: 0;
+                }
+
+                main {
+                    padding: 1.5rem;
+                }
+            }
+
+            /* Small Smartphone Breakpoint */
+            @media (max-width: 600px) {
+                header {
+                    padding: 0.85rem 1rem;
+                    flex-direction: column;
+                    gap: 0.75rem;
+                    align-items: stretch;
+                }
+
+                header .logo {
+                    text-align: center;
+                }
+
+                .user-nav {
+                    justify-content: center;
+                    gap: 0.5rem;
+                }
+
+                .btn-action-sm, 
+                .btn-logout {
+                    flex: 1;
+                    text-align: center;
+                }
+
+                main {
+                    padding: 1rem;
+                }
+
+                .page-header-card, 
+                .connection-card {
+                    padding: 1.25rem;
+                    border-radius: var(--radius-md);
+                }
+
+                .page-header-card h1 {
+                    font-size: 1.4rem;
+                }
+
+                .connections-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .btn-view {
+                    width: 100%;
+                }
+
+                .empty-state {
+                    padding: 2rem 1rem;
+                }
             }
         </style>
     </head>
@@ -412,7 +498,8 @@
                                         </div>
                                     </div>
                                     <div class="card-actions">
-                                        <a href="${pageContext.request.contextPath}/ViewProfileServlet.do?username=${item.user.username}" class="btn-view">View Profile ↗</a>                                </div>
+                                        <a href="${pageContext.request.contextPath}/ViewProfileServlet.do?username=${item.user.username}" class="btn-view">View Profile ↗</a>
+                                    </div>
                                 </div>
                             </c:forEach>
                         </div>
