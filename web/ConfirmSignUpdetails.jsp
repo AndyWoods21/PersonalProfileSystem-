@@ -9,33 +9,32 @@
     <title>Complete Profile Information — DevProfile</title>
     <style>
         :root {
-            /* Shared Light Glass Theme Palette from Index */
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-bg-hover: rgba(255, 255, 255, 0.82);
-            --glass-border: rgba(255, 255, 255, 0.7);
-            --glass-header: rgba(255, 255, 255, 0.75);
+            /* Light Glassmorphism Palette */
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-bg-hover: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-header: rgba(255, 255, 255, 0.55);
             
             /* Text & Accent Tokens */
             --text-dark: #0f172a;
-            --text-muted: #475569;
+            --text-muted: #334155;
             --accent-color: #2563eb;
-            --accent-gradient: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%);
-            --accent-light: rgba(37, 99, 235, 0.12);
+            --accent-gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
             
             /* Elevation & Blur */
-            --glass-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.12);
-            --glass-blur: blur(18px);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --glass-blur: blur(16px);
             
             /* Input & Error Tokens */
-            --input-bg: rgba(255, 255, 255, 0.75);
-            --input-border: rgba(255, 255, 255, 0.8);
-            --input-readonly-bg: rgba(241, 245, 249, 0.5);
+            --input-bg: rgba(255, 255, 255, 0.55);
+            --input-border: rgba(255, 255, 255, 0.7);
+            --input-readonly-bg: rgba(241, 245, 249, 0.4);
             --error-color: #dc2626;
-            --error-bg: rgba(254, 226, 226, 0.75);
-            --error-border: rgba(248, 113, 113, 0.6);
+            --error-bg: rgba(254, 226, 226, 0.65);
+            --error-border: rgba(248, 113, 113, 0.5);
             
             /* Radii */
-            --radius-sm: 10px;
+            --radius-sm: 12px;
             --radius-md: 16px;
             --radius-lg: 24px;
             --radius-pill: 9999px;
@@ -49,7 +48,8 @@
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.35)), url('${pageContext.request.contextPath}/background.jpg') no-repeat center center fixed;
+            background: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), 
+                        url('${pageContext.request.contextPath}/background.jpg') no-repeat center center fixed;
             background-size: cover;
             color: var(--text-dark);
             line-height: 1.6;
@@ -59,7 +59,7 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Navigation Header Matching Index */
+        /* Top Navigation Header */
         header {
             position: sticky;
             top: 0;
@@ -68,7 +68,7 @@
             -webkit-backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid var(--glass-border);
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
         }
 
         nav {
@@ -112,7 +112,7 @@
             padding: 3rem 1.5rem;
         }
 
-        /* Outer Glass Container */
+        /* Outer Light Glass Container */
         .profile-container {
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur);
@@ -142,6 +142,7 @@
         .profile-header p {
             color: var(--text-muted);
             font-size: 0.95rem;
+            font-weight: 500;
         }
 
         .alert-error {
@@ -178,7 +179,7 @@
             color: var(--text-dark);
         }
 
-        /* Glass Form Inputs */
+        /* Light Glass Form Inputs */
         input[type="text"],
         input[type="email"],
         input[type="url"],
@@ -186,8 +187,8 @@
             width: 100%;
             padding: 0.8rem 1rem;
             background: var(--input-bg);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             border: 1px solid var(--input-border);
             border-radius: var(--radius-sm);
             color: var(--text-dark);
@@ -206,9 +207,9 @@
         input:focus:not([readonly]),
         textarea:focus {
             outline: none;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.85);
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
         textarea {
@@ -216,7 +217,7 @@
             min-height: 100px;
         }
 
-        /* Primary CTA Button with Accent Gradient */
+        /* Primary Button */
         .btn-submit {
             width: 100%;
             padding: 0.9rem 1.25rem;
@@ -227,14 +228,14 @@
             font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
             transition: all 0.25s ease;
             margin-top: 0.5rem;
         }
 
         .btn-submit:hover {
             opacity: 0.95;
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
             transform: translateY(-2px);
         }
 
@@ -256,10 +257,9 @@
         footer {
             text-align: center;
             padding: 2rem;
-            color: #ffffff;
+            color: var(--text-dark);
             font-size: 0.85rem;
             font-weight: 600;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
 
         @media (max-width: 600px) {
@@ -275,7 +275,7 @@
 </head>
 <body>
 
-    <!-- Header / Navigation Matching Index -->
+    <!-- Header / Navigation -->
     <header>
         <nav>
             <a href="${pageContext.request.contextPath}/" class="logo">DevProfile</a>
