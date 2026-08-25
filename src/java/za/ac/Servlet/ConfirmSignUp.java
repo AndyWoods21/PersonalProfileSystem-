@@ -1,8 +1,8 @@
 package za.ac.Servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.ejb.EJB;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import za.ac.bl.PersonalInfoEntityFacadeLocal;
 import za.ac.org.PersonalInfoEntity;
-import za.ac.org.User; // Ensure User entity is imported
+import za.ac.org.User;
 
 @WebServlet(name = "ConfirmSignUp", urlPatterns = {"/ConfirmSignUp", "/ConfirmSignUp.do"})
 public class ConfirmSignUp extends HttpServlet {
@@ -33,8 +33,8 @@ public class ConfirmSignUp extends HttpServlet {
         User currentUser = (User) session.getAttribute("currentUser");
 
         if (pi == null) {
-            request.setAttribute("errorMessage", "No registration details found to confirm. Please sign up again.");
-            request.getRequestDispatcher("signUp.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "No registration details found to confirm. Please sign up again.");
+            response.sendRedirect(request.getContextPath() + "/signUp.jsp");
             return;
         }
          
@@ -46,13 +46,22 @@ public class ConfirmSignUp extends HttpServlet {
 
             pifl.create(pi); // Persist completed profile entity to database
             
+            // Set PersonalInfo and initialize empty lists in session scope
+            session.setAttribute("PersonalInfo", pi);
+            session.setAttribute("skillsList", new ArrayList<>());
+            session.setAttribute("workExperienceList", new ArrayList<>());
+            session.setAttribute("educationList", new ArrayList<>());
+            session.setAttribute("certificationsList", new ArrayList<>());
+            session.setAttribute("referencesList", new ArrayList<>());
+            
             // Clean up temporary sign-up session attribute
             session.removeAttribute("NewSignUp");
             
-            // Forward to login page with success confirmation
-            request.setAttribute("successMessage", "Account created successfully! Please log in.");
-            RequestDispatcher disp = request.getRequestDispatcher("login.jsp");
-            disp.forward(request, response);
+            // Store success message in session so it survives redirect
+            session.setAttribute("successMessage", "Account created successfully! Please log in.");
+            
+            // Redirect to login page
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
         } catch (Exception e) {
             log("Failed to persist user profile", e);
             request.setAttribute("errorMessage", "An error occurred while creating your profile. Please try again.");
@@ -62,6 +71,6 @@ public class ConfirmSignUp extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Finalizes registration and persists PersonalInfoEntity into storage.";
+        return "Finalizes registration and redirects user to login.jsp.";
     }
 }
