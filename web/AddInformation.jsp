@@ -251,7 +251,7 @@
                     type="url" 
                     id="website" 
                     name="website" 
-                    value="<c:out value='${sessionScope.PersonalInfo.website}' />"
+                    value="<c:out value='${sessionScope.PersonalInfo.websiteUrl}' />"
                     placeholder="https://yourportfolio.com" 
                 />
             </div>
