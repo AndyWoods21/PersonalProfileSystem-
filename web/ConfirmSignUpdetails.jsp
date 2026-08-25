@@ -9,28 +9,28 @@
     <title>Complete Profile Information — DevProfile</title>
     <style>
         :root {
-            /* Light Glassmorphism Palette */
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-bg-hover: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-header: rgba(255, 255, 255, 0.55);
+            /* Light Glassmorphism Surface Tokens */
+            --glass-bg: rgba(255, 255, 255, 0.68);
+            --glass-bg-hover: rgba(255, 255, 255, 0.82);
+            --glass-border: rgba(255, 255, 255, 0.65);
+            --glass-header: rgba(255, 255, 255, 0.75);
             
             /* Text & Accent Tokens */
             --text-dark: #0f172a;
-            --text-muted: #334155;
+            --text-muted: #475569;
             --accent-color: #2563eb;
             --accent-gradient: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
             
             /* Elevation & Blur */
-            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            --glass-blur: blur(16px);
+            --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+            --glass-blur: blur(20px);
             
             /* Input & Error Tokens */
             --input-bg: rgba(255, 255, 255, 0.55);
-            --input-border: rgba(255, 255, 255, 0.7);
-            --input-readonly-bg: rgba(241, 245, 249, 0.4);
-            --error-color: #dc2626;
-            --error-bg: rgba(254, 226, 226, 0.65);
+            --input-border: rgba(203, 213, 225, 0.6);
+            --input-readonly-bg: rgba(241, 245, 249, 0.6);
+            --error-color: #991b1b;
+            --error-bg: rgba(254, 226, 226, 0.7);
             --error-border: rgba(248, 113, 113, 0.5);
             
             /* Radii */
@@ -48,7 +48,8 @@
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)), 
+            /* Bright translucent white tint overlay on top of background image */
+            background: linear-gradient(rgba(241, 245, 249, 0.35), rgba(241, 245, 249, 0.35)), 
                         url('${pageContext.request.contextPath}/background.jpg') no-repeat center center fixed;
             background-size: cover;
             color: var(--text-dark);
@@ -68,7 +69,7 @@
             -webkit-backdrop-filter: var(--glass-blur);
             border-bottom: 1px solid var(--glass-border);
             z-index: 1000;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         nav {
@@ -187,14 +188,20 @@
             width: 100%;
             padding: 0.8rem 1rem;
             background: var(--input-bg);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 1px solid var(--input-border);
             border-radius: var(--radius-sm);
             color: var(--text-dark);
             font-size: 0.95rem;
             transition: all 0.2s ease;
             font-family: inherit;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+            opacity: 1;
         }
 
         input[readonly] {
@@ -207,7 +214,7 @@
         input:focus:not([readonly]),
         textarea:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             border-color: var(--accent-color);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
@@ -257,7 +264,7 @@
         footer {
             text-align: center;
             padding: 2rem;
-            color: var(--text-dark);
+            color: var(--text-muted);
             font-size: 0.85rem;
             font-weight: 600;
         }
