@@ -1,6 +1,8 @@
 package za.ac.Servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -9,14 +11,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import za.ac.bl.CertificationFacadeLocal;
+import za.ac.bl.EducationFacadeLocal;
 import za.ac.bl.PersonalInfoEntityFacadeLocal;
+import za.ac.bl.ReferenceFacadeLocal;
+import za.ac.bl.SkillFacadeLocal;
 import za.ac.bl.UserFacadeLocal;
+
+
 import za.ac.org.PersonalInfoEntity;
 import za.ac.org.User;
 
 /**
- * Servlet handling user authentication and loading profile data into the
- * session.
+ * Servlet handling user authentication and loading complete profile data
+ * into the session for CV rendering and dashboard display.
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet", "/LoginServlet.do"})
 public class LoginServlet extends HttpServlet {
@@ -26,6 +35,20 @@ public class LoginServlet extends HttpServlet {
 
     @EJB
     private PersonalInfoEntityFacadeLocal profileFacade;
+
+    @EJB
+    private SkillFacadeLocal skillFacade;
+
+   
+
+    @EJB
+    private EducationFacadeLocal educationFacade;
+
+    @EJB
+    private CertificationFacadeLocal certificationFacade;
+
+    @EJB
+    private ReferenceFacadeLocal referenceFacade;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -66,14 +89,25 @@ public class LoginServlet extends HttpServlet {
                 try {
                     profile = profileFacade.findByUser(user);
                 } catch (Exception e) {
-                    // Profile lookup fail-safe (allows user to log in even if profile record doesn't exist yet)
                     log("Profile load failed for user: " + username, e);
                 }
 
-                // Save entities and status in session for Dashboard.jsp
+                // Safely load CV detail sections from EJBs
+                List<?> skillsList = fetchListSafely(() -> skillFacade.findByUser(user));
+                
+                List<?> educationList = fetchListSafely(() -> educationFacade.findByUser(user));
+                List<?> certificationsList = fetchListSafely(() -> certificationFacade.findByUser(user));
+                List<?> referencesList = fetchListSafely(() -> referenceFacade.findByUser(user));
+
+                // Save entities and status in session for Dashboard.jsp and PDF export
                 session.setAttribute("currentUser", user);
                 session.setAttribute("PersonalInfo", profile);
-                session.setAttribute("isRegistered", true); // Marks user as logged in for future updates
+                session.setAttribute("skillsList", skillsList);
+                
+                session.setAttribute("educationList", educationList);
+                session.setAttribute("certificationsList", certificationsList);
+                session.setAttribute("referencesList", referencesList);
+                session.setAttribute("isRegistered", true);
 
                 // Redirect to Dashboard
                 response.sendRedirect(request.getContextPath() + "/Dashboard.jsp");
@@ -92,8 +126,29 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Helper interface for safe EJB data fetching.
+     */
+    @FunctionalInterface
+    private interface EJBSupplier<T> {
+        T get() throws Exception;
+    }
+
+    /**
+     * Utility method to prevent NullPointerExceptions during session binding.
+     */
+    private <T> List<T> fetchListSafely(EJBSupplier<List<T>> supplier) {
+        try {
+            List<T> result = supplier.get();
+            return (result != null) ? result : new ArrayList<>();
+        } catch (Exception e) {
+            log("Failed to load section collection: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
     @Override
     public String getServletInfo() {
-        return "Login Servlet handling user database verification and session profile setup.";
+        return "Login Servlet handling user database verification and session profile setup including all CV sections.";
     }
 }
