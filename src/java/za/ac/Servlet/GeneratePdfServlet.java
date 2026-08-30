@@ -75,7 +75,9 @@ public class GeneratePdfServlet extends HttpServlet {
         String email = (profile != null && profile.getEmail() != null) ? profile.getEmail() : "N/A";
         String phone = (profile != null && profile.getPhone() != null) ? profile.getPhone() : "N/A";
         String location = (profile != null && profile.getLocation() != null) ? profile.getLocation() : "N/A";
-        String website = (profile != null && profile.getWebsiteUrl() != null) ? profile.getWebsiteUrl() : "N/A";
+        String website = (profile != null && profile.getWebsiteUrl() != null) ? profile.getWebsiteUrl() : null;
+        String github = (profile != null && profile.getGithubUrl() != null) ? profile.getGithubUrl() : null;
+        String linkedin = (profile != null && profile.getLinkedinUrl() != null) ? profile.getLinkedinUrl() : null;
         String summary = (profile != null && profile.getProfessionalSummary() != null) ? profile.getProfessionalSummary() : null;
 
         response.setContentType("application/pdf");
@@ -93,7 +95,7 @@ public class GeneratePdfServlet extends HttpServlet {
             // ==========================================
             PdfPTable headerTable = new PdfPTable(2);
             headerTable.setWidthPercentage(100);
-            headerTable.setWidths(new float[]{65f, 35f});
+            headerTable.setWidths(new float[]{55f, 45f});
 
             // Name & Subtitle Cell
             PdfPCell leftHeaderCell = new PdfPCell();
@@ -115,8 +117,15 @@ public class GeneratePdfServlet extends HttpServlet {
             contactPara.add(new Phrase("Email: " + email + "\n", HEADER_CONTACT_FONT));
             contactPara.add(new Phrase("Phone: " + phone + "\n", HEADER_CONTACT_FONT));
             contactPara.add(new Phrase("Location: " + location + "\n", HEADER_CONTACT_FONT));
-            if (!"N/A".equals(website)) {
-                contactPara.add(new Phrase("Portfolio: " + website, HEADER_CONTACT_FONT));
+            
+            if (website != null && !website.trim().isEmpty()) {
+                contactPara.add(new Phrase("Website: " + website + "\n", HEADER_CONTACT_FONT));
+            }
+            if (github != null && !github.trim().isEmpty()) {
+                contactPara.add(new Phrase("GitHub: " + github + "\n", HEADER_CONTACT_FONT));
+            }
+            if (linkedin != null && !linkedin.trim().isEmpty()) {
+                contactPara.add(new Phrase("LinkedIn: " + linkedin + "\n", HEADER_CONTACT_FONT));
             }
             rightHeaderCell.addElement(contactPara);
 
@@ -229,8 +238,10 @@ public class GeneratePdfServlet extends HttpServlet {
                     skillsCell.addElement(createSectionTitleParagraph("SKILLS"));
                     for (Skill skill : skillList) {
                         String sName = (skill.getSkillName() != null) ? skill.getSkillName() : "Skill";
-                        String sLevel = (skill.getProficiencyLevel() != null) ? " (" + skill.getProficiencyLevel() + ")" : "";
-                        Paragraph p = new Paragraph("• " + sName + sLevel, NORMAL_FONT);
+                        String sCat = (skill.getCategory() != null && !skill.getCategory().trim().isEmpty()) ? " [" + skill.getCategory() + "]" : "";
+                        String sLevel = (skill.getProficiencyLevel() != null && !skill.getProficiencyLevel().trim().isEmpty()) ? " (" + skill.getProficiencyLevel() + ")" : "";
+                        
+                        Paragraph p = new Paragraph("• " + sName + sCat + sLevel, NORMAL_FONT);
                         p.setSpacingAfter(2);
                         skillsCell.addElement(p);
                     }
@@ -246,14 +257,23 @@ public class GeneratePdfServlet extends HttpServlet {
                     for (Certification cert : certList) {
                         String cTitle = (cert.getTitle() != null) ? cert.getTitle() : "Certification";
                         String cOrg = (cert.getIssuingOrganization() != null) ? cert.getIssuingOrganization() : "";
-                        String cDate = (cert.getIssueDate() != null) ? " (" + cert.getIssueDate() + ")" : "";
+                        String cDate = (cert.getIssueDate() != null && !cert.getIssueDate().isEmpty()) ? " (" + cert.getIssueDate() + ")" : "";
+                        String cUrl = (cert.getCredentialUrl() != null && !cert.getCredentialUrl().isEmpty()) ? cert.getCredentialUrl() : null;
 
                         Paragraph p = new Paragraph(cTitle, ITEM_TITLE_FONT);
                         Paragraph sub = new Paragraph(cOrg + cDate, ITEM_SUBTITLE_FONT);
-                        sub.setSpacingAfter(4);
                         
                         certsCell.addElement(p);
                         certsCell.addElement(sub);
+                        
+                        if (cUrl != null) {
+                            Paragraph urlPara = new Paragraph("URL: " + cUrl, NORMAL_FONT);
+                            certsCell.addElement(urlPara);
+                        }
+                        
+                        Paragraph spacer = new Paragraph(" ");
+                        spacer.setSpacingAfter(4);
+                        certsCell.addElement(spacer);
                     }
                 }
 
@@ -279,7 +299,7 @@ public class GeneratePdfServlet extends HttpServlet {
 
                     String rName = (ref.getName() != null) ? ref.getName() : "Reference";
                     String rJob = (ref.getJobTitle() != null) ? ref.getJobTitle() : "";
-                    String rCompany = (ref.getCompany() != null) ? " @ " + ref.getCompany() : "";
+                    String rCompany = (ref.getCompany() != null && !ref.getCompany().isEmpty()) ? " @ " + ref.getCompany() : "";
                     String rEmail = (ref.getEmail() != null) ? ref.getEmail() : "";
 
                     cell.addElement(new Paragraph(rName, ITEM_TITLE_FONT));
