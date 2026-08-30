@@ -29,6 +29,14 @@ import za.ac.org.Skill;
 import za.ac.org.User;
 import za.ac.org.WorkExperience;
 
+// Direct DAO Imports - Update package paths if your DAOs live elsewhere
+import za.ac.DAO.CertificationDAO;
+import za.ac.DAO.EducationDAO;
+import za.ac.DAO.PersonalInfoDAO;
+import za.ac.DAO.ReferenceDAO;
+import za.ac.DAO.SkillDAO;
+import za.ac.DAO.WorkExperienceDAO;
+
 @WebServlet(name = "GeneratePdfServlet", urlPatterns = {"/GeneratePdfServlet", "/GeneratePdfServlet.do"})
 public class GeneratePdfServlet extends HttpServlet {
 
@@ -56,18 +64,24 @@ public class GeneratePdfServlet extends HttpServlet {
             return;
         }
 
-        // Retrieve session attributes
-        PersonalInfoEntity profile = (session != null) ? (PersonalInfoEntity) session.getAttribute("PersonalInfo") : null;
-        @SuppressWarnings("unchecked")
-        List<WorkExperience> workList = (session != null) ? (List<WorkExperience>) session.getAttribute("workExperienceList") : null;
-        @SuppressWarnings("unchecked")
-        List<Education> eduList = (session != null) ? (List<Education>) session.getAttribute("educationList") : null;
-        @SuppressWarnings("unchecked")
-        List<Skill> skillList = (session != null) ? (List<Skill>) session.getAttribute("skillsList") : null;
-        @SuppressWarnings("unchecked")
-        List<Certification> certList = (session != null) ? (List<Certification>) session.getAttribute("certificationsList") : null;
-        @SuppressWarnings("unchecked")
-        List<Reference> refList = (session != null) ? (List<Reference>) session.getAttribute("referencesList") : null;
+        // ==========================================
+        // OPTION A: FETCH DIRECLTY FROM DATABASE DAOS
+        // ==========================================
+        int userId = currentUser.getUserId(); // Adjust method name if your User model uses getId()
+
+        PersonalInfoDAO personalInfoDao = new PersonalInfoDAO();
+        WorkExperienceDAO workDao = new WorkExperienceDAO();
+        EducationDAO eduDao = new EducationDAO();
+        SkillDAO skillDao = new SkillDAO();
+        CertificationDAO certDao = new CertificationDAO();
+        ReferenceDAO refDao = new ReferenceDAO();
+
+        PersonalInfoEntity profile = personalInfoDao.getPersonalInfoByUserId(userId);
+        List<WorkExperience> workList = workDao.getWorkExperienceByUserId(userId);
+        List<Education> eduList = eduDao.getEducationByUserId(userId);
+        List<Skill> skillList = skillDao.getSkillsByUserId(userId);
+        List<Certification> certList = certDao.getCertificationsByUserId(userId);
+        List<Reference> refList = refDao.getReferencesByUserId(userId);
 
         // Personal Information fallback handling
         String fullname = (profile != null && profile.getFullname() != null && !profile.getFullname().isEmpty()) ? profile.getFullname() : currentUser.getUsername();
