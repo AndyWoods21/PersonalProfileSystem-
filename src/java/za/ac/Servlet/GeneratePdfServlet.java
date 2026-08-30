@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+// Entity imports only
 import za.ac.org.Certification;
 import za.ac.org.Education;
 import za.ac.org.PersonalInfoEntity;
@@ -28,13 +29,6 @@ import za.ac.org.Reference;
 import za.ac.org.Skill;
 import za.ac.org.User;
 import za.ac.org.WorkExperience;
-
-import za.ac.DAO.CertificationDAO;
-import za.ac.DAO.EducationDAO;
-import za.ac.DAO.PersonalInfoDAO;
-import za.ac.DAO.ReferenceDAO;
-import za.ac.DAO.SkillDAO;
-import za.ac.DAO.WorkExperienceDAO;
 
 @WebServlet(name = "GeneratePdfServlet", urlPatterns = {"/GeneratePdfServlet", "/GeneratePdfServlet.do"})
 public class GeneratePdfServlet extends HttpServlet {
@@ -51,6 +45,7 @@ public class GeneratePdfServlet extends HttpServlet {
     private static final Font ITALIC_FONT = new Font(Font.FontFamily.HELVETICA, 9, Font.ITALIC, new BaseColor(100, 116, 139));
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -62,29 +57,17 @@ public class GeneratePdfServlet extends HttpServlet {
             return;
         }
 
-        int userId = currentUser.getUserId();
+        // Fetching data directly from session attributes (adjust attribute names if needed)
+        PersonalInfoEntity profile = (PersonalInfoEntity) session.getAttribute("personalInfo");
+        List<WorkExperience> workList = (List<WorkExperience>) session.getAttribute("workExperienceList");
+        List<Education> eduList = (List<Education>) session.getAttribute("educationList");
+        List<Skill> skillList = (List<Skill>) session.getAttribute("skillList");
+        List<Certification> certList = (List<Certification>) session.getAttribute("certificationList");
+        List<Reference> refList = (List<Reference>) session.getAttribute("referenceList");
 
-        PersonalInfoDAO personalInfoDao = new PersonalInfoDAO();
-        WorkExperienceDAO workDao = new WorkExperienceDAO();
-        EducationDAO eduDao = new EducationDAO();
-        SkillDAO skillDao = new SkillDAO();
-        CertificationDAO certDao = new CertificationDAO();
-        ReferenceDAO refDao = new ReferenceDAO();
-
-        PersonalInfoEntity profile = personalInfoDao.getPersonalInfoByUserId(userId);
-        List<WorkExperience> workList = workDao.getWorkExperienceByUserId(userId);
-        List<Education> eduList = eduDao.getEducationByUserId(userId);
-        List<Skill> skillList = skillDao.getSkillsByUserId(userId);
-        List<Certification> certList = certDao.getCertificationsByUserId(userId);
-        List<Reference> refList = refDao.getReferencesByUserId(userId);
-
-        // System output for server console diagnostic
-        System.out.println("=== PDF GENERATION DEBUG ===");
-        System.out.println("User ID: " + userId);
-        System.out.println("Work Experience Count: " + (workList != null ? workList.size() : "NULL"));
-        System.out.println("Education Count: " + (eduList != null ? eduList.size() : "NULL"));
-
-        String fullname = (profile != null && profile.getFullname() != null && !profile.getFullname().isEmpty()) ? profile.getFullname() : currentUser.getUsername();
+        String fullname = (profile != null && profile.getFullname() != null && !profile.getFullname().isEmpty()) 
+                          ? profile.getFullname() 
+                          : currentUser.getUsername();
         String jobTitle = (profile != null && profile.getJobTitle() != null) ? profile.getJobTitle() : "Professional Candidate";
         String email = (profile != null && profile.getEmail() != null) ? profile.getEmail() : "N/A";
         String phone = (profile != null && profile.getPhone() != null) ? profile.getPhone() : "N/A";
