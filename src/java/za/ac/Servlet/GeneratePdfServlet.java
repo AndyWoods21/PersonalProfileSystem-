@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-// Entity imports only
 import za.ac.org.Certification;
 import za.ac.org.Education;
 import za.ac.org.PersonalInfoEntity;
@@ -33,6 +32,7 @@ import za.ac.org.WorkExperience;
 @WebServlet(name = "GeneratePdfServlet", urlPatterns = {"/GeneratePdfServlet", "/GeneratePdfServlet.do"})
 public class GeneratePdfServlet extends HttpServlet {
 
+    // Document Fonts
     private static final Font TITLE_FONT = new Font(Font.FontFamily.HELVETICA, 22, Font.BOLD, BaseColor.WHITE);
     private static final Font SUBTITLE_FONT = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, new BaseColor(56, 189, 248));
     private static final Font HEADER_CONTACT_FONT = new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, new BaseColor(226, 232, 240));
@@ -45,7 +45,6 @@ public class GeneratePdfServlet extends HttpServlet {
     private static final Font ITALIC_FONT = new Font(Font.FontFamily.HELVETICA, 9, Font.ITALIC, new BaseColor(100, 116, 139));
 
     @Override
-    @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -57,17 +56,21 @@ public class GeneratePdfServlet extends HttpServlet {
             return;
         }
 
-        // Fetching data directly from session attributes (adjust attribute names if needed)
-        PersonalInfoEntity profile = (PersonalInfoEntity) session.getAttribute("personalInfo");
-        List<WorkExperience> workList = (List<WorkExperience>) session.getAttribute("workExperienceList");
-        List<Education> eduList = (List<Education>) session.getAttribute("educationList");
-        List<Skill> skillList = (List<Skill>) session.getAttribute("skillList");
-        List<Certification> certList = (List<Certification>) session.getAttribute("certificationList");
-        List<Reference> refList = (List<Reference>) session.getAttribute("referenceList");
+        // Retrieve session attributes
+        PersonalInfoEntity profile = (session != null) ? (PersonalInfoEntity) session.getAttribute("PersonalInfo") : null;
+        @SuppressWarnings("unchecked")
+        List<WorkExperience> workList = (session != null) ? (List<WorkExperience>) session.getAttribute("workExperienceList") : null;
+        @SuppressWarnings("unchecked")
+        List<Education> eduList = (session != null) ? (List<Education>) session.getAttribute("educationList") : null;
+        @SuppressWarnings("unchecked")
+        List<Skill> skillList = (session != null) ? (List<Skill>) session.getAttribute("skillsList") : null;
+        @SuppressWarnings("unchecked")
+        List<Certification> certList = (session != null) ? (List<Certification>) session.getAttribute("certificationsList") : null;
+        @SuppressWarnings("unchecked")
+        List<Reference> refList = (session != null) ? (List<Reference>) session.getAttribute("referencesList") : null;
 
-        String fullname = (profile != null && profile.getFullname() != null && !profile.getFullname().isEmpty()) 
-                          ? profile.getFullname() 
-                          : currentUser.getUsername();
+        // Personal Information fallback handling
+        String fullname = (profile != null && profile.getFullname() != null && !profile.getFullname().isEmpty()) ? profile.getFullname() : currentUser.getUsername();
         String jobTitle = (profile != null && profile.getJobTitle() != null) ? profile.getJobTitle() : "Professional Candidate";
         String email = (profile != null && profile.getEmail() != null) ? profile.getEmail() : "N/A";
         String phone = (profile != null && profile.getPhone() != null) ? profile.getPhone() : "N/A";
@@ -79,7 +82,7 @@ public class GeneratePdfServlet extends HttpServlet {
 
         response.setContentType("application/pdf");
         String fileName = fullname.replaceAll("\\s+", "_") + "_CV.pdf";
-        response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 
         Document document = new Document(PageSize.A4, 36, 36, 36, 36);
 
@@ -87,18 +90,22 @@ public class GeneratePdfServlet extends HttpServlet {
             PdfWriter.getInstance(document, out);
             document.open();
 
+            // ==========================================
             // 1. HEADER BANNER SECTION
+            // ==========================================
             PdfPTable headerTable = new PdfPTable(2);
             headerTable.setWidthPercentage(100);
             headerTable.setWidths(new float[]{55f, 45f});
 
+            // Name & Subtitle Cell
             PdfPCell leftHeaderCell = new PdfPCell();
-            leftHeaderCell.setBackgroundColor(new BaseColor(15, 23, 42));
+            leftHeaderCell.setBackgroundColor(new BaseColor(15, 23, 42)); // Dark Navy
             leftHeaderCell.setPadding(16);
             leftHeaderCell.setBorder(PdfPCell.NO_BORDER);
             leftHeaderCell.addElement(new Paragraph(fullname, TITLE_FONT));
             leftHeaderCell.addElement(new Paragraph(jobTitle.toUpperCase(), SUBTITLE_FONT));
 
+            // Contact Info Cell
             PdfPCell rightHeaderCell = new PdfPCell();
             rightHeaderCell.setBackgroundColor(new BaseColor(15, 23, 42));
             rightHeaderCell.setPadding(16);
@@ -128,14 +135,18 @@ public class GeneratePdfServlet extends HttpServlet {
 
             addSpacer(document, 10);
 
+            // ==========================================
             // 2. PROFESSIONAL SUMMARY
+            // ==========================================
             if (summary != null && !summary.trim().isEmpty()) {
                 addSectionHeader(document, "PROFESSIONAL SUMMARY");
                 document.add(new Paragraph(summary, NORMAL_FONT));
                 addSpacer(document, 12);
             }
 
+            // ==========================================
             // 3. WORK EXPERIENCE
+            // ==========================================
             if (workList != null && !workList.isEmpty()) {
                 addSectionHeader(document, "WORK EXPERIENCE");
                 for (WorkExperience work : workList) {
@@ -173,7 +184,9 @@ public class GeneratePdfServlet extends HttpServlet {
                 addSpacer(document, 6);
             }
 
+            // ==========================================
             // 4. EDUCATION
+            // ==========================================
             if (eduList != null && !eduList.isEmpty()) {
                 addSectionHeader(document, "EDUCATION");
                 for (Education edu : eduList) {
@@ -208,19 +221,21 @@ public class GeneratePdfServlet extends HttpServlet {
                 addSpacer(document, 6);
             }
 
-            // 5. SKILLS & CERTIFICATIONS
+            // ==========================================
+            // 5. SKILLS & CERTIFICATIONS (2-COLUMN GRID)
+            // ==========================================
             if ((skillList != null && !skillList.isEmpty()) || (certList != null && !certList.isEmpty())) {
                 PdfPTable twoColTable = new PdfPTable(2);
                 twoColTable.setWidthPercentage(100);
                 twoColTable.setWidths(new float[]{50f, 50f});
 
+                // --- Skills Column ---
                 PdfPCell skillsCell = new PdfPCell();
                 skillsCell.setBorder(PdfPCell.NO_BORDER);
                 skillsCell.setPaddingRight(10);
                 
                 if (skillList != null && !skillList.isEmpty()) {
-                    skillsCell.addElement(new Paragraph("SKILLS", SECTION_FONT));
-                    skillsCell.addElement(createBlueLineTable());
+                    skillsCell.addElement(createSectionTitleParagraph("SKILLS"));
                     for (Skill skill : skillList) {
                         String sName = (skill.getSkillName() != null) ? skill.getSkillName() : "Skill";
                         String sCat = (skill.getCategory() != null && !skill.getCategory().trim().isEmpty()) ? " [" + skill.getCategory() + "]" : "";
@@ -232,13 +247,13 @@ public class GeneratePdfServlet extends HttpServlet {
                     }
                 }
 
+                // --- Certifications Column ---
                 PdfPCell certsCell = new PdfPCell();
                 certsCell.setBorder(PdfPCell.NO_BORDER);
                 certsCell.setPaddingLeft(10);
 
                 if (certList != null && !certList.isEmpty()) {
-                    certsCell.addElement(new Paragraph("CERTIFICATIONS", SECTION_FONT));
-                    certsCell.addElement(createBlueLineTable());
+                    certsCell.addElement(createSectionTitleParagraph("CERTIFICATIONS"));
                     for (Certification cert : certList) {
                         String cTitle = (cert.getTitle() != null) ? cert.getTitle() : "Certification";
                         String cOrg = (cert.getIssuingOrganization() != null) ? cert.getIssuingOrganization() : "";
@@ -268,7 +283,9 @@ public class GeneratePdfServlet extends HttpServlet {
                 addSpacer(document, 10);
             }
 
+            // ==========================================
             // 6. REFERENCES
+            // ==========================================
             if (refList != null && !refList.isEmpty()) {
                 addSectionHeader(document, "REFERENCES");
                 PdfPTable refTable = new PdfPTable(2);
@@ -296,6 +313,7 @@ public class GeneratePdfServlet extends HttpServlet {
                     refTable.addCell(cell);
                 }
 
+                // Balance odd number of reference cells
                 if (refList.size() % 2 != 0) {
                     PdfPCell emptyCell = new PdfPCell();
                     emptyCell.setBorder(PdfPCell.NO_BORDER);
@@ -318,27 +336,30 @@ public class GeneratePdfServlet extends HttpServlet {
         doGet(request, response);
     }
 
+    // Helper method to write styled section headers
     private void addSectionHeader(Document document, String title) throws Exception {
-        Paragraph p = new Paragraph(title, SECTION_FONT);
-        p.setSpacingBefore(8);
-        p.setSpacingAfter(2);
-        document.add(p);
-        document.add(createBlueLineTable());
-        addSpacer(document, 4);
+        document.add(createSectionTitleParagraph(title));
     }
 
-    private PdfPTable createBlueLineTable() {
+    private Paragraph createSectionTitleParagraph(String title) {
+        Paragraph p = new Paragraph(title, SECTION_FONT);
+        p.setSpacingBefore(8);
+        p.setSpacingAfter(4);
+        
+        // Adds an underline line beneath section headings
         PdfPTable lineTable = new PdfPTable(1);
         lineTable.setWidthPercentage(100);
         PdfPCell lineCell = new PdfPCell();
         lineCell.setFixedHeight(1.5f);
-        lineCell.setBackgroundColor(new BaseColor(2, 132, 199));
+        lineCell.setBackgroundColor(new BaseColor(2, 132, 199)); // Sky Blue Line
         lineCell.setBorder(PdfPCell.NO_BORDER);
         lineTable.addCell(lineCell);
-        lineTable.setSpacingAfter(6);
-        return lineTable;
+        
+        p.add(lineTable);
+        return p;
     }
 
+    // Helper method for consistent document vertical spacing
     private void addSpacer(Document document, float space) throws Exception {
         Paragraph spacer = new Paragraph(" ");
         spacer.setSpacingBefore(space);
