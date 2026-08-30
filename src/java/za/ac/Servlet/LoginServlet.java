@@ -97,7 +97,7 @@ public class LoginServlet extends HttpServlet {
                     log("Profile load failed for user: " + username, e);
                 }
 
-                // Safely load CV detail sections from EJBs
+                // Safely load available CV detail sections from EJBs
                 List<?> skillsList = fetchListSafely(() -> skillFacade.findByUser(user));
                 List<?> educationList = fetchListSafely(() -> educationFacade.findByUser(user));
                 List<?> certificationsList = fetchListSafely(() -> certificationFacade.findByUser(user));
@@ -107,6 +107,7 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("currentUser", user);
                 session.setAttribute("PersonalInfo", profile);
                 session.setAttribute("skillsList", skillsList);
+                session.setAttribute("workExperienceList", new ArrayList<>()); // Safely bypasses missing WorkExperience EJB
                 session.setAttribute("educationList", educationList);
                 session.setAttribute("certificationsList", certificationsList);
                 session.setAttribute("referencesList", referencesList);
