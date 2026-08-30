@@ -12,23 +12,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import za.ac.bl.PersonalInfoEntityFacadeLocal;
 import za.ac.bl.UserFacadeLocal;
 import za.ac.org.PersonalInfoEntity;
 import za.ac.org.User;
 import za.ac.utility.EmailUtility;
 
 /**
- * Handles initial user sign-up validation, account creation, and OTP email dispatch.
+ * Handles initial user sign-up validation, in-memory account creation, and OTP email dispatch.
  */
 @WebServlet(name = "SignUpServlet", urlPatterns = {"/SignUpServlet", "/SignUpServlet.do"})
 public class SignUpServlet extends HttpServlet {
 
     @EJB
     private UserFacadeLocal ufl;
-
-    @EJB
-    private PersonalInfoEntityFacadeLocal pifl;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -59,7 +55,7 @@ public class SignUpServlet extends HttpServlet {
         username = username.trim();
         email = email.trim();
 
-        // Check if username already exists
+        // Check if username already exists in database
         User existingUser = ufl.findByUsername(username);
         if (existingUser != null) {
             RequestDispatcher disp = request.getRequestDispatcher("AlreadyHaveAnAcc.jsp");
@@ -73,39 +69,30 @@ public class SignUpServlet extends HttpServlet {
             long tenMinutesInMillis = 10 * 60 * 1000;
             Date expiryTime = new Date(System.currentTimeMillis() + tenMinutesInMillis);
 
-            // 2. Create and persist User entity with OTP details
-            User user = createUser(username, password, otpCode, expiryTime);
-            ufl.create(user);
+            // 2. Instantiate unpersisted User & PersonalInfo entities (in-memory)
+            User pendingUser = createUser(username, password, otpCode, expiryTime);
+            PersonalInfoEntity pendingProfile = createPI(fullName, email);
+            pendingProfile.setUser(pendingUser);
 
-            // 3. Fetch managed User instance to guarantee persistence state
-            User savedUser = ufl.findByUsername(username);
-
-            // 4. Create and link PersonalInfoEntity with saved User
-            PersonalInfoEntity pi = createPI(fullName, email);
-            pi.setUser(savedUser);
-
-            // 5. Persist PersonalInfoEntity explicitly using its facade
-            pifl.create(pi);
-
-            // 6. Send OTP Email asynchronously / non-blocking
+            // 3. Dispatch OTP Email
             try {
                 EmailUtility.sendVerificationEmail(email, otpCode, request.getContextPath());
             } catch (MessagingException me) {
                 log("Failed to send OTP email to " + email, me);
             }
 
-            // 7. Store pending user details in session for OTP verification
-            session.setAttribute("pendingUser", savedUser);
-            session.setAttribute("PersonalInfo", pi);
-            session.setAttribute("NewSignUp", pi);
+            // 4. Store unpersisted entities in session for OTP verification servlet to persist
+            session.setAttribute("pendingUser", pendingUser);
+            session.setAttribute("PersonalInfo", pendingProfile);
+            session.setAttribute("NewSignUp", pendingProfile);
             session.setAttribute("isRegistered", Boolean.FALSE);
 
-            // 8. Redirect cleanly to OTP verification page
+            // 5. Redirect cleanly to OTP verification page
             response.sendRedirect(request.getContextPath() + "/verifyOtp.jsp");
 
         } catch (Exception e) {
-            log("Error during registration process", e);
-            request.setAttribute("errorMessage", "Database error occurred during registration: " + e.getMessage());
+            log("Error during registration setup", e);
+            request.setAttribute("errorMessage", "An error occurred during sign-up initialization: " + e.getMessage());
             request.getRequestDispatcher("signUp.jsp").forward(request, response);
         }
     }
@@ -130,6 +117,6 @@ public class SignUpServlet extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Handles initial user sign-up validation, account creation, and OTP email dispatch.";
+        return "Handles initial user sign-up validation, in-memory account creation, and OTP email dispatch.";
     }
 }
