@@ -29,7 +29,6 @@ import za.ac.org.Skill;
 import za.ac.org.User;
 import za.ac.org.WorkExperience;
 
-// Direct DAO Imports - Update package paths if your DAOs live elsewhere
 import za.ac.DAO.CertificationDAO;
 import za.ac.DAO.EducationDAO;
 import za.ac.DAO.PersonalInfoDAO;
@@ -40,7 +39,6 @@ import za.ac.DAO.WorkExperienceDAO;
 @WebServlet(name = "GeneratePdfServlet", urlPatterns = {"/GeneratePdfServlet", "/GeneratePdfServlet.do"})
 public class GeneratePdfServlet extends HttpServlet {
 
-    // Document Fonts
     private static final Font TITLE_FONT = new Font(Font.FontFamily.HELVETICA, 22, Font.BOLD, BaseColor.WHITE);
     private static final Font SUBTITLE_FONT = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, new BaseColor(56, 189, 248));
     private static final Font HEADER_CONTACT_FONT = new Font(Font.FontFamily.HELVETICA, 9, Font.NORMAL, new BaseColor(226, 232, 240));
@@ -64,10 +62,7 @@ public class GeneratePdfServlet extends HttpServlet {
             return;
         }
 
-        // ==========================================
-        // OPTION A: FETCH DIRECLTY FROM DATABASE DAOS
-        // ==========================================
-        int userId = currentUser.getUserId(); // Adjust method name if your User model uses getId()
+        int userId = currentUser.getUserId();
 
         PersonalInfoDAO personalInfoDao = new PersonalInfoDAO();
         WorkExperienceDAO workDao = new WorkExperienceDAO();
@@ -83,7 +78,12 @@ public class GeneratePdfServlet extends HttpServlet {
         List<Certification> certList = certDao.getCertificationsByUserId(userId);
         List<Reference> refList = refDao.getReferencesByUserId(userId);
 
-        // Personal Information fallback handling
+        // System output for server console diagnostic
+        System.out.println("=== PDF GENERATION DEBUG ===");
+        System.out.println("User ID: " + userId);
+        System.out.println("Work Experience Count: " + (workList != null ? workList.size() : "NULL"));
+        System.out.println("Education Count: " + (eduList != null ? eduList.size() : "NULL"));
+
         String fullname = (profile != null && profile.getFullname() != null && !profile.getFullname().isEmpty()) ? profile.getFullname() : currentUser.getUsername();
         String jobTitle = (profile != null && profile.getJobTitle() != null) ? profile.getJobTitle() : "Professional Candidate";
         String email = (profile != null && profile.getEmail() != null) ? profile.getEmail() : "N/A";
@@ -96,7 +96,7 @@ public class GeneratePdfServlet extends HttpServlet {
 
         response.setContentType("application/pdf");
         String fileName = fullname.replaceAll("\\s+", "_") + "_CV.pdf";
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        response.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
 
         Document document = new Document(PageSize.A4, 36, 36, 36, 36);
 
@@ -104,22 +104,18 @@ public class GeneratePdfServlet extends HttpServlet {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // ==========================================
             // 1. HEADER BANNER SECTION
-            // ==========================================
             PdfPTable headerTable = new PdfPTable(2);
             headerTable.setWidthPercentage(100);
             headerTable.setWidths(new float[]{55f, 45f});
 
-            // Name & Subtitle Cell
             PdfPCell leftHeaderCell = new PdfPCell();
-            leftHeaderCell.setBackgroundColor(new BaseColor(15, 23, 42)); // Dark Navy
+            leftHeaderCell.setBackgroundColor(new BaseColor(15, 23, 42));
             leftHeaderCell.setPadding(16);
             leftHeaderCell.setBorder(PdfPCell.NO_BORDER);
             leftHeaderCell.addElement(new Paragraph(fullname, TITLE_FONT));
             leftHeaderCell.addElement(new Paragraph(jobTitle.toUpperCase(), SUBTITLE_FONT));
 
-            // Contact Info Cell
             PdfPCell rightHeaderCell = new PdfPCell();
             rightHeaderCell.setBackgroundColor(new BaseColor(15, 23, 42));
             rightHeaderCell.setPadding(16);
@@ -149,18 +145,14 @@ public class GeneratePdfServlet extends HttpServlet {
 
             addSpacer(document, 10);
 
-            // ==========================================
             // 2. PROFESSIONAL SUMMARY
-            // ==========================================
             if (summary != null && !summary.trim().isEmpty()) {
                 addSectionHeader(document, "PROFESSIONAL SUMMARY");
                 document.add(new Paragraph(summary, NORMAL_FONT));
                 addSpacer(document, 12);
             }
 
-            // ==========================================
             // 3. WORK EXPERIENCE
-            // ==========================================
             if (workList != null && !workList.isEmpty()) {
                 addSectionHeader(document, "WORK EXPERIENCE");
                 for (WorkExperience work : workList) {
@@ -198,9 +190,7 @@ public class GeneratePdfServlet extends HttpServlet {
                 addSpacer(document, 6);
             }
 
-            // ==========================================
             // 4. EDUCATION
-            // ==========================================
             if (eduList != null && !eduList.isEmpty()) {
                 addSectionHeader(document, "EDUCATION");
                 for (Education edu : eduList) {
@@ -235,21 +225,19 @@ public class GeneratePdfServlet extends HttpServlet {
                 addSpacer(document, 6);
             }
 
-            // ==========================================
-            // 5. SKILLS & CERTIFICATIONS (2-COLUMN GRID)
-            // ==========================================
+            // 5. SKILLS & CERTIFICATIONS
             if ((skillList != null && !skillList.isEmpty()) || (certList != null && !certList.isEmpty())) {
                 PdfPTable twoColTable = new PdfPTable(2);
                 twoColTable.setWidthPercentage(100);
                 twoColTable.setWidths(new float[]{50f, 50f});
 
-                // --- Skills Column ---
                 PdfPCell skillsCell = new PdfPCell();
                 skillsCell.setBorder(PdfPCell.NO_BORDER);
                 skillsCell.setPaddingRight(10);
                 
                 if (skillList != null && !skillList.isEmpty()) {
-                    skillsCell.addElement(createSectionTitleParagraph("SKILLS"));
+                    skillsCell.addElement(new Paragraph("SKILLS", SECTION_FONT));
+                    skillsCell.addElement(createBlueLineTable());
                     for (Skill skill : skillList) {
                         String sName = (skill.getSkillName() != null) ? skill.getSkillName() : "Skill";
                         String sCat = (skill.getCategory() != null && !skill.getCategory().trim().isEmpty()) ? " [" + skill.getCategory() + "]" : "";
@@ -261,13 +249,13 @@ public class GeneratePdfServlet extends HttpServlet {
                     }
                 }
 
-                // --- Certifications Column ---
                 PdfPCell certsCell = new PdfPCell();
                 certsCell.setBorder(PdfPCell.NO_BORDER);
                 certsCell.setPaddingLeft(10);
 
                 if (certList != null && !certList.isEmpty()) {
-                    certsCell.addElement(createSectionTitleParagraph("CERTIFICATIONS"));
+                    certsCell.addElement(new Paragraph("CERTIFICATIONS", SECTION_FONT));
+                    certsCell.addElement(createBlueLineTable());
                     for (Certification cert : certList) {
                         String cTitle = (cert.getTitle() != null) ? cert.getTitle() : "Certification";
                         String cOrg = (cert.getIssuingOrganization() != null) ? cert.getIssuingOrganization() : "";
@@ -297,9 +285,7 @@ public class GeneratePdfServlet extends HttpServlet {
                 addSpacer(document, 10);
             }
 
-            // ==========================================
             // 6. REFERENCES
-            // ==========================================
             if (refList != null && !refList.isEmpty()) {
                 addSectionHeader(document, "REFERENCES");
                 PdfPTable refTable = new PdfPTable(2);
@@ -327,7 +313,6 @@ public class GeneratePdfServlet extends HttpServlet {
                     refTable.addCell(cell);
                 }
 
-                // Balance odd number of reference cells
                 if (refList.size() % 2 != 0) {
                     PdfPCell emptyCell = new PdfPCell();
                     emptyCell.setBorder(PdfPCell.NO_BORDER);
@@ -350,30 +335,27 @@ public class GeneratePdfServlet extends HttpServlet {
         doGet(request, response);
     }
 
-    // Helper method to write styled section headers
     private void addSectionHeader(Document document, String title) throws Exception {
-        document.add(createSectionTitleParagraph(title));
-    }
-
-    private Paragraph createSectionTitleParagraph(String title) {
         Paragraph p = new Paragraph(title, SECTION_FONT);
         p.setSpacingBefore(8);
-        p.setSpacingAfter(4);
-        
-        // Adds an underline line beneath section headings
+        p.setSpacingAfter(2);
+        document.add(p);
+        document.add(createBlueLineTable());
+        addSpacer(document, 4);
+    }
+
+    private PdfPTable createBlueLineTable() {
         PdfPTable lineTable = new PdfPTable(1);
         lineTable.setWidthPercentage(100);
         PdfPCell lineCell = new PdfPCell();
         lineCell.setFixedHeight(1.5f);
-        lineCell.setBackgroundColor(new BaseColor(2, 132, 199)); // Sky Blue Line
+        lineCell.setBackgroundColor(new BaseColor(2, 132, 199));
         lineCell.setBorder(PdfPCell.NO_BORDER);
         lineTable.addCell(lineCell);
-        
-        p.add(lineTable);
-        return p;
+        lineTable.setSpacingAfter(6);
+        return lineTable;
     }
 
-    // Helper method for consistent document vertical spacing
     private void addSpacer(Document document, float space) throws Exception {
         Paragraph spacer = new Paragraph(" ");
         spacer.setSpacingBefore(space);
