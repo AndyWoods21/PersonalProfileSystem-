@@ -18,7 +18,7 @@ public class EmailUtility {
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
     private static final String SENDER_EMAIL = "buthelezia776@gmail.com";
-    private static final String SENDER_PASSWORD = "magcnbegrbwcjsqw";
+    private static final String SENDER_PASSWORD = "dgegyxbwioejmrar";
 
     /**
      * Sends an account verification email containing a 6-digit OTP code.
