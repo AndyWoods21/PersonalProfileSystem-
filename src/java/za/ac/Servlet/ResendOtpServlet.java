@@ -2,6 +2,7 @@ package za.ac.Servlet;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
@@ -49,30 +50,37 @@ public class ResendOtpServlet extends HttpServlet {
             targetEmail = request.getParameter("email");
         }
 
-        // 3. Fallback database lookup via PersonalInfoEntity if user object is null
+        // 3. Database lookup safely matching available EJB methods
         if (user == null && targetEmail != null && !targetEmail.trim().isEmpty()) {
-            PersonalInfoEntity pi = pifl.findByEmail(targetEmail.trim());
-            if (pi != null) {
-                user = pi.getUser();
-            } else {
-                user = ufl.findByUsername(targetEmail.trim());
+            user = ufl.findByUsername(targetEmail.trim());
+
+            if (user == null) {
+                List<PersonalInfoEntity> allProfiles = pifl.findAll();
+                if (allProfiles != null) {
+                    for (PersonalInfoEntity pi : allProfiles) {
+                        if (pi.getEmail() != null && pi.getEmail().equalsIgnoreCase(targetEmail.trim())) {
+                            user = pi.getUser();
+                            break;
+                        }
+                    }
+                }
             }
         }
 
-        // 4. Fail gracefully if no email/user context could be resolved
+        // 4. Fail gracefully if context couldn't be resolved
         if (user == null || targetEmail == null || targetEmail.trim().isEmpty()) {
             request.setAttribute("errorMessage", "No email address found for this account. Please log in again.");
             request.getRequestDispatcher("verifyOtp.jsp").forward(request, response);
             return;
         }
 
-        // 5. Regenerate OTP and update expiration
+        // 5. Regenerate OTP and set 10-minute expiry
         String newOtp = String.format("%06d", new Random().nextInt(900000) + 100000);
         user.setOtpCode(newOtp);
         user.setOtpExpiry(new Date(System.currentTimeMillis() + (10 * 60 * 1000)));
         ufl.edit(user);
 
-        // 6. Resend email and update session state
+        // 6. Resend verification email and set session parameters
         try {
             EmailUtility.sendVerificationEmail(targetEmail, newOtp, request.getContextPath());
             
