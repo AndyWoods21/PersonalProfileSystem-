@@ -18,9 +18,6 @@ import za.ac.org.PersonalInfoEntity;
 import za.ac.org.User;
 import za.ac.utility.EmailUtility;
 
-/**
- * Handles initial user sign-up validation, account creation, and OTP email dispatch.
- */
 @WebServlet(name = "SignUpServlet", urlPatterns = {"/SignUpServlet", "/SignUpServlet.do"})
 public class SignUpServlet extends HttpServlet {
 
@@ -47,7 +44,6 @@ public class SignUpServlet extends HttpServlet {
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
 
-        // Validate basic parameters
         if (username == null || username.trim().isEmpty() || 
             password == null || password.trim().isEmpty() ||
             email == null || email.trim().isEmpty()) {
@@ -70,37 +66,41 @@ public class SignUpServlet extends HttpServlet {
         try {
             // 1. Generate 6-digit numeric OTP and set 10-minute expiry
             String otpCode = String.format("%06d", new Random().nextInt(900000) + 100000);
-            long tenMinutesInMillis = 10 * 60 * 1000;
-            Date expiryTime = new Date(System.currentTimeMillis() + tenMinutesInMillis);
+            Date expiryTime = new Date(System.currentTimeMillis() + (10 * 60 * 1000));
 
-            // 2. Create and persist User entity with OTP details
+            // 2. Create & persist User entity
             User user = createUser(username, password, otpCode, expiryTime);
             ufl.create(user);
 
-            // 3. Fetch managed User instance to guarantee persistence state
+            // 3. Retrieve managed User instance
             User savedUser = ufl.findByUsername(username);
 
-            // 4. Create and link PersonalInfoEntity with saved User
+            // 4. Create & link PersonalInfoEntity
             PersonalInfoEntity pi = createPI(fullName, email);
             pi.setUser(savedUser);
-
-            // 5. Persist PersonalInfoEntity explicitly using its facade
             pifl.create(pi);
 
-            // 6. Send OTP Email asynchronously / non-blocking
+            // 5. Send OTP Email with explicit exception logging
+            boolean emailSent = true;
             try {
                 EmailUtility.sendVerificationEmail(email, otpCode, request.getContextPath());
-            } catch (MessagingException me) {
-                log("Failed to send OTP email to " + email, me);
+            } catch (Exception me) {
+                emailSent = false;
+                log("CRITICAL: Failed to send OTP email to " + email, me);
+                me.printStackTrace();
             }
 
-            // 7. Store pending user details in session for OTP verification
+            // 6. Store full context in session
             session.setAttribute("pendingUser", savedUser);
             session.setAttribute("PersonalInfo", pi);
-            session.setAttribute("NewSignUp", pi);
+            session.setAttribute("userEmail", email); // Direct session backup for OTP resends
             session.setAttribute("isRegistered", Boolean.FALSE);
 
-            // 8. Redirect cleanly to OTP verification page
+            if (!emailSent) {
+                session.setAttribute("warningMessage", "Account created, but we could not deliver the OTP email. Please click 'Resend OTP'.");
+            }
+
+            // 7. Redirect to OTP verification page
             response.sendRedirect(request.getContextPath() + "/verifyOtp.jsp");
 
         } catch (Exception e) {
@@ -126,10 +126,5 @@ public class SignUpServlet extends HttpServlet {
         pi.setFullname(fullName != null ? fullName.trim() : "");
         pi.setEmail(email != null ? email.trim() : "");
         return pi;
-    }
-
-    @Override
-    public String getServletInfo() {
-        return "Handles initial user sign-up validation, account creation, and OTP email dispatch.";
     }
 }
