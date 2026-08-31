@@ -26,24 +26,20 @@
     </title>
     <style>
         :root {
-            /* Glassmorphism Palette */
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-bg-hover: rgba(255, 255, 255, 0.82);
             --glass-border: rgba(255, 255, 255, 0.7);
             --glass-header: rgba(255, 255, 255, 0.75);
             
-            /* Text & Accent Colors */
             --text-dark: #0f172a;
             --text-muted: #475569;
             --accent-color: #2563eb;
             --accent-gradient: linear-gradient(135deg, #1d4ed8 0%, #6d28d9 100%);
             --accent-light: rgba(37, 99, 235, 0.12);
             
-            /* Elevation & Blurs */
             --glass-shadow: 0 10px 32px 0 rgba(0, 0, 0, 0.12);
             --glass-blur: blur(18px);
             
-            /* Radii */
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
@@ -66,7 +62,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Navigation Header */
         header {
             position: sticky;
             top: 0;
@@ -104,16 +99,37 @@
             align-items: center;
         }
 
-        nav a {
+        nav a, nav button {
             color: var(--text-muted);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 600;
             transition: all 0.2s ease;
+            background: none;
+            border: none;
+            cursor: pointer;
         }
 
-        nav a:hover {
+        nav a:hover, nav button:hover {
             color: var(--accent-color);
+        }
+
+        nav .btn-print {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 0.55rem 1.25rem;
+            border-radius: var(--radius-pill);
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        nav .btn-print:hover {
+            color: #ffffff;
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
         nav a.btn-back {
@@ -130,14 +146,12 @@
             transform: translateY(-1px);
         }
 
-        /* Layout Structure */
         main {
             max-width: 1280px;
             margin: 0 auto;
             padding: 2.5rem 2rem;
         }
 
-        /* Hero Header Section */
         .hero {
             display: flex;
             align-items: center;
@@ -185,7 +199,6 @@
             max-width: 720px;
         }
 
-        /* Grid Layout */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -203,7 +216,6 @@
             gap: 2rem;
         }
 
-        /* Card Container Styles */
         .card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -222,7 +234,6 @@
             letter-spacing: -0.3px;
         }
 
-        /* Items Listing */
         .item-box {
             margin-bottom: 1.5rem;
             padding-bottom: 1.25rem;
@@ -253,7 +264,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* Skill Pill Badges */
         .skills-grid {
             display: flex;
             flex-wrap: wrap;
@@ -280,7 +290,6 @@
             font-weight: 700;
         }
 
-        /* Contact Section */
         .contact-info p {
             margin-bottom: 0.75rem;
             font-size: 0.95rem;
@@ -302,6 +311,152 @@
             color: rgba(255, 255, 255, 0.85);
             font-size: 0.875rem;
         }
+
+        /* PRINT STYLESHEET (Formats layout to match PDF output) */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #1a1a1a !important;
+                font-family: Arial, sans-serif !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            header, footer, .avatar, .btn-back, .btn-print {
+                display: none !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Dark Header Banner */
+            .hero {
+                background: #0e1e38 !important;
+                color: #ffffff !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 40px 50px !important;
+                margin-bottom: 0 !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                box-shadow: none !important;
+            }
+
+            .hero-text h1 {
+                color: #ffffff !important;
+                font-size: 32px !important;
+                font-weight: bold !important;
+                margin-bottom: 5px !important;
+            }
+
+            .hero-text .title {
+                color: #38bdf8 !important;
+                font-size: 18px !important;
+                background: none !important;
+                -webkit-text-fill-color: #38bdf8 !important;
+            }
+
+            .hero-text p:not(.title) {
+                display: none !important; /* Move summary to main grid body */
+            }
+
+            /* Contact section inside Dark Header */
+            .sidebar .contact-info {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                color: #ffffff !important;
+                text-align: right !important;
+                font-size: 13px !important;
+            }
+
+            .sidebar .contact-info h2 {
+                display: none !important;
+            }
+
+            .sidebar .contact-info p {
+                color: #e2e8f0 !important;
+                margin-bottom: 4px !important;
+            }
+
+            .sidebar .contact-info strong {
+                color: #ffffff !important;
+            }
+
+            /* 2-Column Layout */
+            .dashboard-grid {
+                display: flex !important;
+                flex-direction: row-reverse !important; /* Left: Sidebar info, Right: Main body */
+                padding: 40px 50px !important;
+                gap: 40px !important;
+            }
+
+            .sidebar {
+                width: 30% !important;
+                border-right: 1px solid #e2e8f0 !important;
+                padding-right: 20px !important;
+            }
+
+            .main-content {
+                width: 70% !important;
+            }
+
+            .card {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                backdrop-filter: none !important;
+                margin-bottom: 30px !important;
+            }
+
+            .card h2 {
+                font-size: 16px !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
+                color: #0f172a !important;
+                border-bottom: 2px solid #0284c7 !important;
+                padding-bottom: 5px !important;
+                margin-bottom: 15px !important;
+            }
+
+            .skills-grid {
+                display: block !important;
+            }
+
+            .skill-badge {
+                display: block !important;
+                background: transparent !important;
+                border: none !important;
+                padding: 2px 0 !important;
+                box-shadow: none !important;
+                font-size: 13px !important;
+            }
+
+            /* Dynamically add Professional Summary section on print */
+            .main-content::before {
+                content: "PROFESSIONAL SUMMARY";
+                display: block;
+                font-size: 16px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                color: #0f172a;
+                border-bottom: 2px solid #0284c7;
+                padding-bottom: 5px;
+                margin-bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -314,6 +469,9 @@
                 <li><a href="#education">Education</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#certifications">Certifications</a></li>
+                <li>
+                    <button onclick="window.print()" class="btn-print">🖨️ Print CV</button>
+                </li>
                 <li><a href="${pageContext.request.contextPath}/DisplayConnections.jsp" class="btn-back">← Back to Connections</a></li>
             </ul>
         </nav>
@@ -348,7 +506,7 @@
                     </c:choose>
                 </p>
                 
-                <p>
+                <p class="summary-text">
                     <c:choose>
                         <c:when test="${not empty personalInfo and not empty personalInfo.professionalSummary}">
                             <c:out value="${personalInfo.professionalSummary}" />
@@ -571,6 +729,17 @@
                 <section class="card contact-info">
                     <h2>📬 Contact Information</h2>
                     <p>
+                        <strong>Location:</strong> 
+                        <c:choose>
+                            <c:when test="${not empty personalInfo and not empty personalInfo.location}">
+                                <c:out value="${personalInfo.location}" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="not-provided">Information not provided</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <p>
                         <strong>Email:</strong> 
                         <c:choose>
                             <c:when test="${not empty personalInfo and not empty personalInfo.email}">
@@ -586,17 +755,6 @@
                         <c:choose>
                             <c:when test="${not empty personalInfo and not empty personalInfo.phone}">
                                 <c:out value="${personalInfo.phone}" />
-                            </c:when>
-                            <c:otherwise>
-                                <span class="not-provided">Information not provided</span>
-                            </c:otherwise>
-                        </c:choose>
-                    </p>
-                    <p>
-                        <strong>Location:</strong> 
-                        <c:choose>
-                            <c:when test="${not empty personalInfo and not empty personalInfo.location}">
-                                <c:out value="${personalInfo.location}" />
                             </c:when>
                             <c:otherwise>
                                 <span class="not-provided">Information not provided</span>
