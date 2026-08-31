@@ -220,9 +220,9 @@
         </form>
 
         <div class="login-prompt">
-            Didn't receive code? 
-            <a href="${pageContext.request.contextPath}/ResendOtpServlet.do">Resend OTP</a>
-        </div>
+    Didn't receive code? 
+    <a href="${pageContext.request.contextPath}/ResendOtpServlet.do?email=${sessionScope.userEmail != null ? sessionScope.userEmail : sessionScope.PersonalInfo.email}">Resend OTP</a>
+</div>
 
         <a href="${pageContext.request.contextPath}/login.jsp" class="back-link">&larr; Back to Login</a>
         <a href="${pageContext.request.contextPath}/dashboard.jsp" class="back-link">Go to Dashboard</a>
